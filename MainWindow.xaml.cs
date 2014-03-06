@@ -1,17 +1,10 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using MouseKeyboardLibrary;
+using Purple.ViewControllers;
 using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
 namespace Purple
@@ -21,22 +14,67 @@ namespace Purple
     /// </summary>
     public partial class MainWindow : Window
     {
-        //These should be put into a data handler class --
-        MouseHook mouse = new MouseHook();
         public MainWindow()
         {
             InitializeComponent();
+            InitMouseEventHandlers();
         }
 
-        private void Window_Loaded(object sender, EventArgs e)
+        //Initialize View Controllers
+        private MainScreen_VC mainScreenVc = new MainScreen_VC();
+
+        #region MouseHandlers Code to handle mouse driven events on the MainScreen
+        //For some reason i couldn't pass around MouseEventArgs properly.  Bah! --Had to include it in the main form class.  
+        private MouseHook mouseHook = new MouseHook();
+        private int _mouseXLoc;
+        private int _mouseYLoc;
+
+        private void InitMouseEventHandlers()
         {
-            mouse.MouseMove += Mouse_move;
-            mouse.Start();
+            mouseHook.MouseMove += mouseHook_MouseMove;
+            mouseHook.MouseDown += mouseHook_MouseDown;
+            mouseHook.MouseUp += mouseHook_MouseUp;
         }
 
-        private void Mouse_move(object sender, MouseEventArgs eventArgs)
+        private void mouseHook_MouseUp(object sender, MouseEventArgs e)
         {
-            Xcord.Text = eventArgs.X.ToString();
+            //Stub for mouse up action if needed.
         }
+
+        public void mouseHook_MouseDown(object sender, MouseEventArgs e)
+        {
+            mouseHook.Stop();
+            GatherElementDetail();
+        }
+
+        private void mouseHook_MouseMove(object sender, MouseEventArgs e)
+        {
+            Xcord.Text = e.X.ToString();
+            YCord.Text = e.Y.ToString();
+        }
+        
+
+        private void Cursor_Button_Click(object sender, RoutedEventArgs e)
+        {
+            mouseHook.Start();
+        }
+        #endregion
+
+        private void Purple_MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            mainScreenVc.FoundElement_AddRow(ref Found_Element_Grid);
+        }
+
+        private void GatherElementDetail()
+        {
+            //This function is called from the mouseHook_MouseDown() function
+            if (!mouseHook.IsStarted)
+            {
+                mainScreenVc.AddPoint(new Point(double.Parse(Xcord.Text), double.Parse(YCord.Text)));
+                mainScreenVc.FoundElement_AddRow(ref Found_Element_Grid);
+            }
+        }
+        
+       
     }
 }
