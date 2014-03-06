@@ -11,6 +11,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MouseKeyboardLibrary;
+using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
 namespace Purple
 {
@@ -19,9 +21,22 @@ namespace Purple
     /// </summary>
     public partial class MainWindow : Window
     {
+        //These should be put into a data handler class --
+        MouseHook mouse = new MouseHook();
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Window_Loaded(object sender, EventArgs e)
+        {
+            mouse.MouseMove += Mouse_move;
+            mouse.Start();
+        }
+
+        private void Mouse_move(object sender, MouseEventArgs eventArgs)
+        {
+            Xcord.Text = eventArgs.X.ToString();
         }
     }
 }

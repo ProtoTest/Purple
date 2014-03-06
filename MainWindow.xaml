@@ -1,8 +1,17 @@
-﻿<Window x:Class="Purple.MainWindow"
+﻿<Window x:Name="Purple_MainWindow" x:Class="Purple.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
+        Title="ProtoTest - Purple" Height="467.2" Width="537" Loaded="Window_Loaded" Background="#FF63166A" ResizeMode="CanMinimize">
+    <Grid Background="#7F4D136E">
+        <Button x:Name="Cursor_Button" Content="Get Element" HorizontalAlignment="Left" Margin="10,59,0,0" VerticalAlignment="Top" Width="75"/>
+        <Label x:Name="XCordLabel" Content="X" HorizontalAlignment="Left" Margin="100,56,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="YCordLabel" Content="Y" HorizontalAlignment="Left" Margin="185,56,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="Xcord" HorizontalAlignment="Left" Height="23" Margin="122,59,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="48"/>
+        <TextBox x:Name="YCord" HorizontalAlignment="Left" Height="23" Margin="207,59,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="48"/>
+        <DataGrid x:Name="Found_Element_Grid" HorizontalAlignment="Left" Margin="10,104,0,0" VerticalAlignment="Top" Height="80" Width="497"/>
+        <DataGrid x:Name="Selected_Elements_Grid" HorizontalAlignment="Left" Margin="10,220,0,0" VerticalAlignment="Top" Height="157" Width="497"/>
+        <Button x:Name="Build_Cache_File" Content="Cache" HorizontalAlignment="Left" Margin="10,392,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="Add_Element_Selected" Content="Add Element" HorizontalAlignment="Left" Margin="10,189,0,0" VerticalAlignment="Top" Width="497"/>
+
     </Grid>
 </Window>
