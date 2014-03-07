@@ -62,6 +62,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DataHandlers\PurplePath.cs" />
     <Compile Include="DataHandlers\UIA_ElementCacher.cs" />
     <Compile Include="DataHandlers\UIA_ElementInfo.cs" />
     <Compile Include="ViewControllers\MainScreen_VC.cs" />

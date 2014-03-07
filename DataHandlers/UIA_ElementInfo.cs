@@ -3,24 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Automation;
+using Condition = System.Windows.Automation.Condition;
+
 
 namespace Purple.DataHandlers
 {
     public class UIA_ElementInfo
     {
+        private AutomationElement _uiaElement;
         private Point _ElementLocation;
         private String _ElementName;
         private String _ElementParent;
         private String _ElementAutomationID;
         private String _ElementType;
+        private String _PurplePath;
+        
 
-        public UIA_ElementInfo(Point loc, String name, String AID, String Type)
+        public UIA_ElementInfo(Point loc, AutomationElement element)
         {
+            _uiaElement = element;
             _ElementLocation = loc;
-            _ElementName = name;
+            _ElementName = _uiaElement.Current.Name;
             //Need to find a good way to get the parent
-            _ElementAutomationID = AID;
-            _ElementType = Type;
+            _ElementAutomationID = _uiaElement.Current.AutomationId;
+            _ElementType = _uiaElement.Current.LocalizedControlType;
+            _PurplePath = new PurplePath().getPurplePath(_uiaElement);
+
         }
 
         public string[] Headers()

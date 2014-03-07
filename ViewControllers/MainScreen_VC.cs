@@ -55,7 +55,7 @@ namespace Purple.ViewControllers
                 AutomationElement element = AutomationElement.FromPoint(_ElementLocList.Last());
                 if (element != null)
                 {
-                    _foundElement = new UIA_ElementInfo(_ElementLocList.Last(), element.Current.Name, element.Current.AutomationId, element.Current.LocalizedControlType);
+                    _foundElement = new UIA_ElementInfo(_ElementLocList.Last(), element);
                 }
                 else
                 {
