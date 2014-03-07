@@ -15,6 +15,8 @@ namespace Purple.ViewControllers
 {
     public class MainScreen_VC 
     {
+        //The purpose of this class is to handle all interactions from the DataHandler Classes that need to be either updated from the UI or stored back in the data classes.
+        //The UI classes should NEVER directly interact with the data storeage classes except through classes like this.  More screens need more view controllers but not more data classes.
         //Variables for mouse positions
         private int _PreviousXLoc;
         private int _PreviousYLoc;
@@ -30,6 +32,7 @@ namespace Purple.ViewControllers
         private UIA_ElementInfo _foundElement;
         private UIA_ElementCacher _CachefileBuilder;
 
+        //Constructor
         public MainScreen_VC()
         {
             _ElementLocList = new List<Point>();
