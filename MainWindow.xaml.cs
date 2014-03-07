@@ -62,7 +62,7 @@ namespace Purple
 
         private void Purple_MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            mainScreenVc.FoundElement_AddRow(ref Found_Element_Grid);
+            //Load events should go here
         }
 
         private void GatherElementDetail()
@@ -72,6 +72,14 @@ namespace Purple
             {
                 mainScreenVc.AddPoint(new Point(double.Parse(Xcord.Text), double.Parse(YCord.Text)));
                 mainScreenVc.FoundElement_AddRow(ref Found_Element_Grid);
+            }
+        }
+
+        private void Add_Element_Selected_Click(object sender, RoutedEventArgs e)
+        {
+            if (!mouseHook.IsStarted)
+            {
+                mainScreenVc.SelectedElements_AddRow(ref Selected_Elements_Grid);
             }
         }
         

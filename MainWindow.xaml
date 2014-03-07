@@ -11,7 +11,7 @@
         <DataGrid x:Name="Found_Element_Grid" HorizontalAlignment="Left" Margin="10,104,0,0" VerticalAlignment="Top" Height="80" Width="497" SelectedIndex="0" AutoGenerateColumns="False"/>
         <DataGrid x:Name="Selected_Elements_Grid" HorizontalAlignment="Left" Margin="10,220,0,0" VerticalAlignment="Top" Height="157" Width="497"/>
         <Button x:Name="Build_Cache_File" Content="Cache" HorizontalAlignment="Left" Margin="10,392,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button x:Name="Add_Element_Selected" Content="Add Element" HorizontalAlignment="Left" Margin="10,189,0,0" VerticalAlignment="Top" Width="497"/>
+        <Button x:Name="Add_Element_Selected" Content="Add Element" HorizontalAlignment="Left" Margin="10,189,0,0" VerticalAlignment="Top" Width="497" Click="Add_Element_Selected_Click"/>
 
     </Grid>
 </Window>

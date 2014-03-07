@@ -7,16 +7,20 @@ namespace Purple.DataHandlers
 {
     class UIA_ElementCacher
     {
-        private List<UIA_ElementInfo> _ElementsSelected;
+        private List<UIA_ElementInfo> _ElementsInCache;
+        private bool _cachedElements = false;
+        public bool CachedElements { get { return _cachedElements; }}
+        public List<UIA_ElementInfo> ElementsInCache { get { return _ElementsInCache; }}
 
         public UIA_ElementCacher()
         {
-            _ElementsSelected = new List<UIA_ElementInfo>();
+            _ElementsInCache = new List<UIA_ElementInfo>();
         }
 
         public void addElement(UIA_ElementInfo theElement)
         {
-            _ElementsSelected.Add(theElement);
+            _ElementsInCache.Add(theElement);
+            _cachedElements = true;
         }
     }
 }

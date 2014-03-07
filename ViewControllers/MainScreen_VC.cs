@@ -53,7 +53,6 @@ namespace Purple.ViewControllers
                 if (element != null)
                 {
                     _foundElement = new UIA_ElementInfo(_ElementLocList.Last(), element.Current.Name, element.Current.AutomationId, element.Current.LocalizedControlType);
-                    
                 }
                 else
                 {
@@ -62,17 +61,22 @@ namespace Purple.ViewControllers
             }
             else
             {
-                MessageBox.Show("There are no element locations available.");
+                MessageBox.Show("\"This should never be displayed.\"\n\t --Every Developer Ever");
             }
         }
 
         public void FoundElement_AddRow(ref DataGrid dataGrid)
         {
+            BuildElementDG_Headers(ref dataGrid);
+            AddFoundElement(ref dataGrid);
+        }
+
+        private void BuildElementDG_Headers(ref DataGrid dataGrid)
+        {
             DataGridTextColumn columnHeader = new DataGridTextColumn();
+            dataGrid.Columns.Clear();
             if (_foundElement != null)
             {
-                dataGrid.Columns.Clear();
-
                 string[] headerText = _foundElement.Headers();
                 int headercount = headerText.Count();
                 for (int x = 0; x < headercount; x++)
@@ -82,28 +86,42 @@ namespace Purple.ViewControllers
                     columnHeader.Binding = new Binding(string.Format("[{0}]", x));
                     dataGrid.Columns.Add(columnHeader);
                 }
-                AddFoundElement(ref dataGrid);
-            }
-            else
-            {
-                columnHeader.Header = "UI Elements found will be listed here.";
-                dataGrid.Columns.Add(columnHeader);
             }
         }
 
-        public void AddFoundElement(ref DataGrid dataGrid)
+        private void AddFoundElement(ref DataGrid dataGrid)
         {
             List<object> rows = new List<object>();
             rows.Add(_foundElement.elementData());
             dataGrid.ItemsSource = rows;
         }
 
-        public void AddElementToCache(UIA_ElementInfo element)
+        public void SelectedElements_AddRow(ref DataGrid dataGrid)
         {
-            if (element != null)
+            if (_foundElement != null)
             {
-                _CachefileBuilder.addElement(element);
+                if (_CachefileBuilder.CachedElements)
+                {
+                    _CachefileBuilder.addElement(_foundElement);
+                    AddCachedElements(ref dataGrid);
+                }
+                else
+                {
+                    BuildElementDG_Headers(ref dataGrid);
+                    _CachefileBuilder.addElement(_foundElement);
+                    AddCachedElements(ref dataGrid);
+                }
             }
+        }
+
+        private void AddCachedElements(ref DataGrid dataGrid)
+        {
+            List<object> rows = new List<object>();
+            for (int x = 0; x < _CachefileBuilder.ElementsInCache.Count; x++)
+            {
+                rows.Add(_CachefileBuilder.ElementsInCache[x].elementData());
+            }
+            dataGrid.ItemsSource = rows;
         }
 
 
