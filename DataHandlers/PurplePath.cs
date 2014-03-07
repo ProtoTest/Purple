@@ -21,7 +21,7 @@ namespace Purple.DataHandlers
             _deliniator = deliniator;
             _blankValue = blank;
         }
-
+       
         public String getPurplePath(AutomationElement element)
         {
             //I was curious how UI automation would handle having more than one panel with a blank name from Inspect.exe when building this path
@@ -66,8 +66,8 @@ namespace Purple.DataHandlers
 
         public AutomationElement FindElement(String purplePath)
         {
+            //This function will return a AutomationElement based on purple path provided
             List<String> pathStrings = new List<string>(purplePath.Split(_deliniator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
-            
 
             AutomationElement element = AutomationElement.RootElement;
             TreeWalker walker = TreeWalker.ContentViewWalker;

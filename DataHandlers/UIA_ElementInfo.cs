@@ -25,7 +25,6 @@ namespace Purple.DataHandlers
             _uiaElement = element;
             _ElementLocation = loc;
             _ElementName = _uiaElement.Current.Name;
-            //Need to find a good way to get the parent
             _ElementAutomationID = _uiaElement.Current.AutomationId;
             _ElementType = _uiaElement.Current.LocalizedControlType;
             _PurplePath = new PurplePath().getPurplePath(_uiaElement);
@@ -34,25 +33,26 @@ namespace Purple.DataHandlers
 
         public string[] Headers()
         {
-            string[] headerRow = new string[5];
+            string[] headerRow = new string[6];
             headerRow[0] = "X";
             headerRow[1] = "Y";
             headerRow[2] = "Name";
             headerRow[3] = "Automation ID";
             headerRow[4] = "Type";
+            headerRow[5] = "PurplePath";
 
             return headerRow;
         }
 
         public string[] elementData()
         {
-            string[] data = new string[5];
+            string[] data = new string[6];
             data[0] = _ElementLocation.X.ToString();
             data[1] = _ElementLocation.Y.ToString();
             data[2] = _ElementName;
             data[3] = _ElementAutomationID;
             data[4] = _ElementType;
-
+            data[5] = _PurplePath;
             return data;
         }
 

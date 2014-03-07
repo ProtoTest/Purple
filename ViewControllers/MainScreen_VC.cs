@@ -56,6 +56,7 @@ namespace Purple.ViewControllers
                 if (element != null)
                 {
                     _foundElement = new UIA_ElementInfo(_ElementLocList.Last(), element);
+                    
                 }
                 else
                 {
@@ -66,8 +67,9 @@ namespace Purple.ViewControllers
             {
                 MessageBox.Show("\"This should never be displayed.\"\n\t --Every Developer Ever");
             }
+            
         }
-
+       
         public void FoundElement_AddRow(ref DataGrid dataGrid)
         {
             BuildElementDG_Headers(ref dataGrid);
