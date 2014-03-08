@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -7,10 +8,11 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
-using System.Windows.Data;
+using System.Windows.Forms;
 using MouseKeyboardLibrary;
 using Purple.DataHandlers;
-
+using Binding = System.Windows.Data.Binding;
+using DataGrid = System.Windows.Controls.DataGrid;
 using MessageBox = System.Windows.MessageBox;
 
 namespace Purple.ViewControllers
@@ -26,6 +28,14 @@ namespace Purple.ViewControllers
         [DllImport("user32.dll")]
         private static extern void mouse_event(uint dwFlags, int dx, int dy, uint cButtons, uint dwExtraInfo);
 
+        //Thought these two might be needed for sending text to textboxes, but Forms.SendKeys is way easier - these might be useful for something later
+        [DllImport("user32.dll", EntryPoint = "FindWindowEx")]
+        public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
+        [DllImport("User32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, string lParam);
+
+
+        //need to gather constants for the rest of these
         private const int MOUSEEVENTF_LEFTDOWN = 0x02;
         private const int MOUSEEVENTF_LEFTUP = 0x04;
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
@@ -153,6 +163,14 @@ namespace Purple.ViewControllers
                 SetCursorPos(X, Y);
                 mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
                 mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+            }
+        }
+
+        public void AttemptKeyboard()
+        {
+            if (elementFound)
+            {   _foundElement.setfocus();
+                SendKeys.SendWait("Here's a message");
             }
         }
 

@@ -57,5 +57,11 @@ namespace Purple.DataHandlers
             return data;
         }
 
+        public void setfocus()
+        {
+            _uiaElement.SetFocus();
+            
+        }
+
     }
 }
