@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
@@ -18,6 +20,17 @@ namespace Purple.ViewControllers
         //The purpose of this class is to handle all interactions from the DataHandler Classes that need to be either updated from the UI or stored back in the data classes.
         //The UI classes should NEVER directly interact with the data storeage classes except through classes like this.  More screens need more view controllers but not more data classes.
         //Variables for mouse positions
+        [DllImport("user32.dll")]
+        static extern bool SetCursorPos(uint x, uint y);
+
+        [DllImport("user32.dll")]
+        private static extern void mouse_event(uint dwFlags, int dx, int dy, uint cButtons, uint dwExtraInfo);
+
+        private const int MOUSEEVENTF_LEFTDOWN = 0x02;
+        private const int MOUSEEVENTF_LEFTUP = 0x04;
+        private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
+        private const int MOUSEEVENTF_RIGHTUP = 0x10;
+
         private int _PreviousXLoc;
         private int _PreviousYLoc;
         private bool _TrackerRunning;
@@ -31,6 +44,7 @@ namespace Purple.ViewControllers
         //Variables for UIAElements
         private UIA_ElementInfo _foundElement;
         private UIA_ElementCacher _CachefileBuilder;
+        private bool elementFound = false;
 
         //Constructor
         public MainScreen_VC()
@@ -56,7 +70,8 @@ namespace Purple.ViewControllers
                 if (element != null)
                 {
                     _foundElement = new UIA_ElementInfo(_ElementLocList.Last(), element);
-                    
+                    //setting this for use with other functions
+                    elementFound = true;
                 }
                 else
                 {
@@ -129,7 +144,17 @@ namespace Purple.ViewControllers
             dataGrid.ItemsSource = rows;
         }
 
-
+        public void AttemptClick()
+        {
+            if (elementFound)
+            {
+                uint X = (uint) _foundElement.ElementLocation.X;
+                uint Y = (uint) _foundElement.ElementLocation.Y;
+                SetCursorPos(X, Y);
+                mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+            }
+        }
 
 
 

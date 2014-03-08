@@ -1,17 +1,45 @@
 ﻿<Window x:Name="Purple_MainWindow" x:Class="Purple.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ProtoTest - Purple" Height="467.2" Width="537" Background="#FF63166A" ResizeMode="CanMinimize" Loaded="Purple_MainWindow_Loaded">
+        Title="ProtoTest - Purple" Height="467.2" Width="552" Background="#FF63166A" ResizeMode="CanMinimize" Loaded="Purple_MainWindow_Loaded">
     <Grid Background="#7F4D136E">
         <Button x:Name="Cursor_Button" Content="Get Element" HorizontalAlignment="Left" Margin="10,59,0,0" VerticalAlignment="Top" Width="75" Click="Cursor_Button_Click"/>
         <Label x:Name="XCordLabel" Content="X" HorizontalAlignment="Left" Margin="100,56,0,0" VerticalAlignment="Top"/>
         <Label x:Name="YCordLabel" Content="Y" HorizontalAlignment="Left" Margin="185,56,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="Xcord" HorizontalAlignment="Left" Height="23" Margin="122,59,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="48"/>
         <TextBox x:Name="YCord" HorizontalAlignment="Left" Height="23" Margin="207,59,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="48"/>
-        <DataGrid x:Name="Found_Element_Grid" HorizontalAlignment="Left" Margin="10,104,0,0" VerticalAlignment="Top" Height="80" Width="497" SelectedIndex="0" AutoGenerateColumns="False"/>
-        <DataGrid x:Name="Selected_Elements_Grid" HorizontalAlignment="Left" Margin="10,220,0,0" VerticalAlignment="Top" Height="157" Width="497" AutoGenerateColumns="False"/>
+        <DataGrid x:Name="Found_Element_Grid" HorizontalAlignment="Left" Margin="10,104,0,0" VerticalAlignment="Top" Height="64" Width="497" SelectedIndex="0" AutoGenerateColumns="False"/>
+        <DataGrid x:Name="Selected_Elements_Grid" HorizontalAlignment="Left" Margin="10,200,0,0" VerticalAlignment="Top" Height="187" Width="497" AutoGenerateColumns="False"/>
         <Button x:Name="Build_Cache_File" Content="Cache" HorizontalAlignment="Left" Margin="10,392,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button x:Name="Add_Element_Selected" Content="Add Element" HorizontalAlignment="Left" Margin="10,189,0,0" VerticalAlignment="Top" Width="497" Click="Add_Element_Selected_Click"/>
+        <Button x:Name="Add_Element_Selected" Content="Add Element" HorizontalAlignment="Left" Margin="10,173,0,0" VerticalAlignment="Top" Width="497" Click="Add_Element_Selected_Click"/>
+        <Expander x:Name="OptionsExpander" Width="335" ExpandDirection="Left" HorizontalAlignment="Right" Margin="0,10,0,278" IsExpanded="False" BorderThickness="1" BorderBrush="#FF080808" Collapsed="OptionsExpander_Collapsed" Expanded="OptionsExpander_Expanded">
+            <Expander.Header>
+                <TextBlock Text="Options" RenderTransformOrigin="0.5,0.5" Margin="0,0,0,0" Width="Auto">
+                    <TextBlock.LayoutTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1" ScaleY="1"/>
+                            <SkewTransform AngleX="0" AngleY="0"/>
+                            <RotateTransform Angle="90"/>
+                            <TranslateTransform X="0" Y="0"/>
+                        </TransformGroup>
+                    </TextBlock.LayoutTransform>
+                    <TextBlock.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1" ScaleY="1"/>
+                            <SkewTransform AngleX="0" AngleY="0"/>
+                            <RotateTransform Angle="0"/>
+                            <TranslateTransform X="0" Y="0"/>
+                        </TransformGroup>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+            </Expander.Header>
+            <Grid Margin="0,0,0,0" Opacity="0.8" Background="#FF752881">
+                <TextBox x:Name="Options_StartingWindow" TextWrapping="Wrap" Text="Starting Window" Width="205" HorizontalAlignment="Right" Margin="0,29,97,87" Visibility="Collapsed"/>
+
+                <CheckBox x:Name="PurpleStartingPath" Content="Make PurplePaths Relative" HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top" Checked="PurpleStartingPath_Checked" Unchecked="PurpleStartingPath_Unchecked"/>
+            </Grid>
+        </Expander>
+        <Button Content="TestButton" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
 
     </Grid>
 </Window>

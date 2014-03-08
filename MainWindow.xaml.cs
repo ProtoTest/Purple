@@ -52,17 +52,18 @@ namespace Purple
             Xcord.Text = e.X.ToString();
             YCord.Text = e.Y.ToString();
         }
-        
-
-        private void Cursor_Button_Click(object sender, RoutedEventArgs e)
-        {
-            mouseHook.Start();
-        }
         #endregion
 
         private void Purple_MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            //Load events should go here
+            //This function fires when the window is first loaded
+            OptionsExpander.BorderBrush.Opacity = 0;
+        }
+        
+        private void Cursor_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Found_Element_Grid.ItemsSource = null;
+            mouseHook.Start();
         }
 
         private void GatherElementDetail()
@@ -82,7 +83,34 @@ namespace Purple
                 mainScreenVc.SelectedElements_AddRow(ref Selected_Elements_Grid);
             }
         }
+
+
+        #region Options Code to handle options expander
+        private void PurpleStartingPath_Checked(object sender, RoutedEventArgs e)
+        {
+            Options_StartingWindow.Visibility = Visibility.Visible;
+        }
+
+        private void PurpleStartingPath_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Options_StartingWindow.Visibility = Visibility.Collapsed;
+        }
+
+        private void OptionsExpander_Collapsed(object sender, RoutedEventArgs e)
+        {
+            //for some stupid reason i have to hid the fucking border of the thing when it's collapsed
+            OptionsExpander.BorderBrush.Opacity = 0;
+        }
+        private void OptionsExpander_Expanded(object sender, RoutedEventArgs e)
+        {
+            OptionsExpander.BorderBrush.Opacity = 100;
+        }
         
-       
+        #endregion
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            mainScreenVc.AttemptClick();
+        }
     }
 }

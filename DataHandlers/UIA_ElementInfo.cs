@@ -19,6 +19,7 @@ namespace Purple.DataHandlers
         private String _ElementType;
         private String _PurplePath;
         
+        public Point ElementLocation{get { return _ElementLocation; }}
 
         public UIA_ElementInfo(Point loc, AutomationElement element)
         {
@@ -55,7 +56,6 @@ namespace Purple.DataHandlers
             data[5] = _PurplePath;
             return data;
         }
-
 
     }
 }
