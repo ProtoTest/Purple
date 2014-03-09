@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Windows.Automation;
 
@@ -8,15 +9,24 @@ namespace PurpleLib
     public class PurplePath
     {
         //This class is used to build and interpret purplepaths to find AutomationElements
-        private const String DELINIATOR = "//";
-        private const String BLANK = "<<BLANK>>";
+        //These constants should be stored in the app.config
+        private const String DELIMITER = "//";
+        private const String BLANK = "!BLANK!";
         private readonly String _blankValue = BLANK;
-        private readonly String _deliniator = DELINIATOR;
+        private readonly String _delimiter = DELIMITER;
 
-        public PurplePath(String deliniator = DELINIATOR, String blank = BLANK)
+        public PurplePath(String delimiter = DELIMITER, String blank = BLANK)
         {
-            _deliniator = deliniator;
-            _blankValue = blank;
+            _delimiter = ConfigurationManager.AppSettings[DELIMITER];
+            if (_delimiter == null)
+            {
+                _delimiter = delimiter;
+            }
+            _blankValue = ConfigurationManager.AppSettings[BLANK];
+            if (_blankValue == null)
+            {
+                _blankValue = blank;
+            }
         }
 
         public String getPurplePath(AutomationElement element)
@@ -26,7 +36,7 @@ namespace PurpleLib
             //TODO: handle title bars like LQP where the title name changes based on the file opened
             TreeWalker walker = TreeWalker.ContentViewWalker;
             bool parentExists = true; //need to assume that there's a parent
-            String path = element.Current.Name + _deliniator;
+            String path = element.Current.Name + _delimiter;
             AutomationElement parent;
             AutomationElement node = element;
             String purplePath = "";
@@ -42,7 +52,7 @@ namespace PurpleLib
                         //We need to put something for blanks
                         parentName = _blankValue;
                     }
-                    path += parentName + _deliniator;
+                    path += parentName + _delimiter;
                     node = parent;
                 }
                 else
@@ -51,13 +61,13 @@ namespace PurpleLib
                 }
             }
             //now try to build the path in the proper order
-            string[] pathStrings = path.Split(_deliniator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            string[] pathStrings = path.Split(_delimiter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             Array.Reverse(pathStrings);
                 //Reverse the order of the strings in the array so elements appear in top to bottom
             //this trims off the first level, since that's the root element or Desktop
             for (int x = 1; x < pathStrings.Count(); x++)
             {
-                purplePath += _deliniator + pathStrings[x];
+                purplePath += _delimiter + pathStrings[x];
             }
             return purplePath;
         }
@@ -66,7 +76,7 @@ namespace PurpleLib
         {
             //This function will return a AutomationElement based on purple path provided
             var pathStrings =
-                new List<string>(purplePath.Split(_deliniator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
+                new List<string>(purplePath.Split(_delimiter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
 
             AutomationElement element = AutomationElement.RootElement;
             TreeWalker walker = TreeWalker.ContentViewWalker;
