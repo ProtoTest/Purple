@@ -7,7 +7,7 @@ using System.Windows.Automation;
 using Condition = System.Windows.Automation.Condition;
 
 
-namespace Purple.DataHandlers
+namespace PurpleLib
 {
     public class UIA_ElementInfo
     {
@@ -60,7 +60,15 @@ namespace Purple.DataHandlers
         public void setfocus()
         {
             _uiaElement.SetFocus();
-            
+        }
+
+        public void patterns()
+        {
+            AutomationProperty[] props = _uiaElement.GetSupportedProperties();
+            AutomationProperty prop = props[1];
+
+            AutomationPattern[] patterns = _uiaElement.GetSupportedPatterns();
+            AutomationPattern pattern = patterns[0];
         }
 
     }

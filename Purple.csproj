@@ -38,8 +38,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MouseKeyboardLibrary">
+    <Reference Include="MouseKeyboardLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\MouseKeyboardLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="PurpleLib">
+      <HintPath>Libraries\PurpleLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -63,9 +67,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="DataHandlers\PurplePath.cs" />
-    <Compile Include="DataHandlers\UIA_ElementCacher.cs" />
-    <Compile Include="DataHandlers\UIA_ElementInfo.cs" />
     <Compile Include="ViewControllers\MainScreen_VC.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

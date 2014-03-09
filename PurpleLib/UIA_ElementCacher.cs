@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Purple.DataHandlers
+namespace PurpleLib
 {
-    class UIA_ElementCacher
+    public class UIA_ElementCacher
     {
         private List<UIA_ElementInfo> _ElementsInCache;
         private bool _cachedElements = false;

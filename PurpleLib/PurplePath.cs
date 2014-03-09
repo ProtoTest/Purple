@@ -1,27 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Automation;
-using System.Windows.Documents;
 
-namespace Purple.DataHandlers
+namespace PurpleLib
 {
     public class PurplePath
     {
         //This class is used to build and interpret purplepaths to find AutomationElements
         private const String DELINIATOR = "//";
         private const String BLANK = "<<BLANK>>";
-        private String _deliniator = DELINIATOR;
-        private String _blankValue = BLANK;
-        
+        private readonly String _blankValue = BLANK;
+        private readonly String _deliniator = DELINIATOR;
+
         public PurplePath(String deliniator = DELINIATOR, String blank = BLANK)
         {
             _deliniator = deliniator;
             _blankValue = blank;
         }
-       
+
         public String getPurplePath(AutomationElement element)
         {
             //I was curious how UI automation would handle having more than one panel with a blank name from Inspect.exe when building this path
@@ -55,7 +52,8 @@ namespace Purple.DataHandlers
             }
             //now try to build the path in the proper order
             string[] pathStrings = path.Split(_deliniator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            Array.Reverse(pathStrings); //Reverse the order of the strings in the array so elements appear in top to bottom
+            Array.Reverse(pathStrings);
+                //Reverse the order of the strings in the array so elements appear in top to bottom
             //this trims off the first level, since that's the root element or Desktop
             for (int x = 1; x < pathStrings.Count(); x++)
             {
@@ -67,7 +65,8 @@ namespace Purple.DataHandlers
         public AutomationElement FindElement(String purplePath)
         {
             //This function will return a AutomationElement based on purple path provided
-            List<String> pathStrings = new List<string>(purplePath.Split(_deliniator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
+            var pathStrings =
+                new List<string>(purplePath.Split(_deliniator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
 
             AutomationElement element = AutomationElement.RootElement;
             TreeWalker walker = TreeWalker.ContentViewWalker;
@@ -80,7 +79,8 @@ namespace Purple.DataHandlers
                 {
                     pathStrings[i] = "";
                 }
-                findCondition = new PropertyCondition(AutomationElement.NameProperty, pathStrings[i], PropertyConditionFlags.IgnoreCase);
+                findCondition = new PropertyCondition(AutomationElement.NameProperty, pathStrings[i],
+                    PropertyConditionFlags.IgnoreCase);
                 node = element.FindFirst(TreeScope.Children, findCondition);
                 if (node != null)
                 {

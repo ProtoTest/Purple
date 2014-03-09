@@ -110,7 +110,7 @@ namespace Purple
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            mainScreenVc.AttemptKeyboard();
+            mainScreenVc.testpatterns();
         }
     }
 }

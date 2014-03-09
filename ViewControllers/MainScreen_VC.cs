@@ -10,7 +10,7 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using MouseKeyboardLibrary;
-using Purple.DataHandlers;
+using PurpleLib;
 using Binding = System.Windows.Data.Binding;
 using DataGrid = System.Windows.Controls.DataGrid;
 using MessageBox = System.Windows.MessageBox;
@@ -153,7 +153,7 @@ namespace Purple.ViewControllers
             }
             dataGrid.ItemsSource = rows;
         }
-
+        #region TestFunctions
         public void AttemptClick()
         {
             if (elementFound)
@@ -174,6 +174,14 @@ namespace Purple.ViewControllers
             }
         }
 
+        public void testpatterns()
+        {
+            if (elementFound)
+            {
+                _foundElement.patterns();
+            }
+        }
+        #endregion
 
 
 
@@ -182,6 +190,8 @@ namespace Purple.ViewControllers
 
 
 
-       
+
+
+
     }
 }
