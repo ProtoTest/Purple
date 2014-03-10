@@ -1,5 +1,7 @@
 ﻿
+using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -54,12 +56,19 @@ namespace Purple
         }
         #endregion
 
+        #region FormLoad and Exit events
         private void Purple_MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             //This function fires when the window is first loaded
             OptionsExpander.BorderBrush.Opacity = 0;
+            mainScreenVc.SetOptions(ref PurpleStartingPath, ref Options_StartingWindow);
         }
-        
+
+        private void Purple_MainWindow_Unloaded(object sender, RoutedEventArgs e)
+        {
+            mainScreenVc.SaveSettings_OnExit();
+        }
+        #endregion
         private void Cursor_Button_Click(object sender, RoutedEventArgs e)
         {
             Found_Element_Grid.ItemsSource = null;
@@ -100,17 +109,26 @@ namespace Purple
         {
             //for some stupid reason i have to hid the fucking border of the thing when it's collapsed
             OptionsExpander.BorderBrush.Opacity = 0;
+            mainScreenVc.PersistOptions((bool) PurpleStartingPath.IsChecked, Options_StartingWindow.Text);
         }
         private void OptionsExpander_Expanded(object sender, RoutedEventArgs e)
         {
             OptionsExpander.BorderBrush.Opacity = 100;
+            
         }
-        
+        private void Options_StartingWindow_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            
+        }
         #endregion
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             mainScreenVc.testPath();
         }
+
+        
+
+       
     }
 }

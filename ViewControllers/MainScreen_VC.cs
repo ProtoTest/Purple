@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -9,11 +10,15 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using MouseKeyboardLibrary;
+using Purple.DataHandlers;
 using PurpleLib;
 using Binding = System.Windows.Data.Binding;
+using CheckBox = System.Windows.Controls.CheckBox;
 using DataGrid = System.Windows.Controls.DataGrid;
 using MessageBox = System.Windows.MessageBox;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace Purple.ViewControllers
 {
@@ -21,25 +26,10 @@ namespace Purple.ViewControllers
     {
         //The purpose of this class is to handle all interactions from the DataHandler Classes that need to be either updated from the UI or stored back in the data classes.
         //The UI classes should NEVER directly interact with the data storeage classes except through classes like this.  More screens need more view controllers but not more data classes.
-        //Variables for mouse positions
-        [DllImport("user32.dll")]
-        static extern bool SetCursorPos(uint x, uint y);
-
-        [DllImport("user32.dll")]
-        private static extern void mouse_event(uint dwFlags, int dx, int dy, uint cButtons, uint dwExtraInfo);
-
-        //Thought these two might be needed for sending text to textboxes, but Forms.SendKeys is way easier - these might be useful for something later
-        [DllImport("user32.dll", EntryPoint = "FindWindowEx")]
-        public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
-        [DllImport("User32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, string lParam);
-
-
-        //need to gather constants for the rest of these
-        private const int MOUSEEVENTF_LEFTDOWN = 0x02;
-        private const int MOUSEEVENTF_LEFTUP = 0x04;
-        private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
-        private const int MOUSEEVENTF_RIGHTUP = 0x10;
+        //Variables for mouse positions -- Mouse position stuff added to Golem PurpleBaseElement
+        
+        //General Options for PurpleUI
+        private StartOptions _Options = new StartOptions();
 
         private int _PreviousXLoc;
         private int _PreviousYLoc;
@@ -63,7 +53,7 @@ namespace Purple.ViewControllers
             _Location = new Point();
             _CachefileBuilder = new UIA_ElementCacher();
         }
-
+        #region ElementFinding functions for finding elements and displaying paths
         public void AddPoint(Point value)
         {
             _Location.X = value.X;
@@ -79,7 +69,16 @@ namespace Purple.ViewControllers
                 AutomationElement element = AutomationElement.FromPoint(_ElementLocList.Last());
                 if (element != null)
                 {
-                    _foundElement = new UIA_ElementInfo(_ElementLocList.Last(), element);
+                    //Check to see if we have a default window parameter set
+                    if (_Options.UseDefaultWindow)
+                    {
+                        _foundElement = new UIA_ElementInfo(_ElementLocList.Last(), element, _Options.DefaultWindow);
+                    }
+                    else
+                    {
+                       _foundElement = new UIA_ElementInfo(_ElementLocList.Last(), element); 
+                    }
+                    
                     //setting this for use with other functions
                     elementFound = true;
                 }
@@ -153,6 +152,42 @@ namespace Purple.ViewControllers
             }
             dataGrid.ItemsSource = rows;
         }
+        #endregion
+
+        #region ConfigurationOptions
+
+        public void SetOptions(ref CheckBox useDefault, ref TextBox defName)
+        {
+            _Options.UseDefaultWindow = Convert.ToBoolean(ConfigurationManager.AppSettings["UseDefaultStartScreen"]);
+            _Options.DefaultWindow = ConfigurationManager.AppSettings["DefaultStartScreen"];
+
+            useDefault.IsChecked = _Options.UseDefaultWindow;
+            defName.Text = _Options.DefaultWindow;
+        }
+
+        public void PersistOptions(bool enabled, string name)
+        {
+            _Options.UseDefaultWindow = enabled;
+            _Options.DefaultWindow = name;
+        }
+       
+
+        public void SaveSettings_OnExit()
+        {
+            //Can't save appSettings only user settings
+            ConfigurationManager.AppSettings["UseDefaultStartScreen"] = _Options.UseDefaultWindow.ToString();
+            ConfigurationManager.AppSettings["DefaultStartScreen"] = _Options.DefaultWindow;
+        }
+
+        public void ReadOptionVals(ref CheckBox useDefault, ref TextBox defName)
+        {
+            useDefault.IsChecked = _Options.UseDefaultWindow;
+            defName.Text = _Options.DefaultWindow;
+        }
+
+        #endregion
+
+
         #region TestFunctions
         public void AttemptClick()
         {
@@ -160,9 +195,9 @@ namespace Purple.ViewControllers
             {
                 uint X = (uint) _foundElement.ElementLocation.X;
                 uint Y = (uint) _foundElement.ElementLocation.Y;
-                SetCursorPos(X, Y);
-                mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-                mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                //SetCursorPos(X, Y);
+                //mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                //mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
             }
         }
 
@@ -185,8 +220,15 @@ namespace Purple.ViewControllers
 
         public void testPath()
         {
-            AutomationElement thing = new PurplePath().FindElement("//LifeQuest™ Pipeline//Dock Top//Main Menu//Main_MenuFeatures//Main_MenuFeatureConstructionFeatures//Main_MenuFeatureUnknown");
-            //thing.SetFocus();
+            PurplePath Finder = new PurplePath();
+            Finder.DefaultWindowName = "LifeQuest™ Pipeline";
+            Finder.ValueDelimiterStart = '<';
+            Finder.ValueDelimiterEnd = '>';
+            AutomationElement thing = Finder.FindElement("//LifeQuest™ Pipeline//!BLANK!//RLF2013TestFile.qig [2D]//LifeQuestBaseView_ViewBar//ViewBar_OptionsButton");
+            if (thing != null)
+            {
+                MessageBox.Show("Element Found!");
+            }
         }
         
 

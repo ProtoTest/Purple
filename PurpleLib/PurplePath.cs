@@ -13,28 +13,43 @@ namespace PurpleLib
         //These constants should be stored in the app.config
         private const String DELIMITER = "//";
         private const String BLANK = "!BLANK!";
-        private readonly String _blankValue = BLANK;
-        private readonly String _delimiter = DELIMITER;
+        private const String DEFAULTWINDOWNAME = "EMPTY";
+        private const char ORDERSTART = '[';
+        private const char ORDEREND = ']';
 
-        public PurplePath(String delimiter = DELIMITER, String blank = BLANK)
+        public String DefaultWindowName {set { _topLevelWindowName = value; }}
+        public char ValueDelimiterStart {set { _orderStart = value; }}
+        public char ValueDelimiterEnd {set { _orderEnd = value; }}
+        public String Delimiter {set { _delimiter = value; }}
+        public String BlankValue {set { _blankValue = value; }}
+
+        private String _blankValue = BLANK;
+        private String _delimiter = DELIMITER;
+        private string _topLevelWindowName = DEFAULTWINDOWNAME;
+        private char _orderStart = ORDERSTART;
+        private char _orderEnd = ORDEREND;
+
+        public PurplePath(char orderstart = ORDERSTART, char orderend = ORDEREND, string wName = DEFAULTWINDOWNAME, String delimiter = DELIMITER, String blank = BLANK)
         {
-            _delimiter = ConfigurationManager.AppSettings["Delimiter"];
-            if (_delimiter == null)
-            {
-                _delimiter = delimiter;
-            }
-            _blankValue = ConfigurationManager.AppSettings["Blank"];
-            if (_blankValue == null)
-            {
-                _blankValue = blank;
-            }
+            _orderStart = orderstart;
+            _orderEnd = orderend;
+            _topLevelWindowName = wName;
+            _delimiter = delimiter;
+            _blankValue = blank;
         }
 
+
+        /// <summary>
+        /// Finds the PurplePath based on the element found.  This will return the entire purple path for the window the element was found in.  If 
+        /// Default window name is turned on in the UI that will become the top level name under the desktop level and ignore any other text in the window
+        /// title bar
+        /// </summary>
+        /// <param name="element"></param>
         public String getPurplePath(AutomationElement element)
         {
             //I was curious how UI automation would handle having more than one panel with a blank name from Inspect.exe when building this path
             //It was surpriseing to know that the TreeWalker handles that for us when we walk up the tree, and conversly down the tree.
-            //TODO: handle title bars like LQP where the title name changes based on the file opened
+            
             TreeWalker walker = TreeWalker.RawViewWalker;
             TreeWalker walkDown = TreeWalker.RawViewWalker;
             bool parentExists = true; //need to assume that there's a parent
@@ -42,7 +57,6 @@ namespace PurpleLib
             AutomationElement parent;
             AutomationElement node = element;
             String purplePath = "";
-            AutomationElementCollection allchildelements;
             string parentName = node.Current.Name;
 
             //HOLY HELL - FINALLY got this working i think
@@ -96,7 +110,7 @@ namespace PurpleLib
                     //check to see if we need to add on a value for number of items with the same damn name
                     if (childnum > 0)
                     {
-                        path += "[" + childnum + "]";
+                        path += _orderStart + childnum + _orderEnd;
                     }
                     //add on the delimiter
                     path += _delimiter;
@@ -126,34 +140,42 @@ namespace PurpleLib
             //this trims off the first level, since that's the root element or Desktop
             for (int x = 1; x < pathStrings.Count(); x++)
             {
+                //This if will replace the first value with the default window name if provided by the UI
+                if (x == 1 && _topLevelWindowName != DEFAULTWINDOWNAME)
+                {
+                    pathStrings[x] = _topLevelWindowName;
+                }
                 purplePath += _delimiter + pathStrings[x];
             }
             return purplePath;
         }
 
+        /// <summary>
+        /// Finds the AutomationElement based on the PurplePath provided.  This will return the element the first element that matches the last level of the path locator provided.
+        /// If DefaultWindowName is set, the top level window name will be matched only partially.  This accounts for window titles dynamic titles based on file name or user.
+        /// </summary>
+        /// <param name="purplePath"></param>
         public AutomationElement FindElement(String purplePath)
         {
-            
             //This function will return a AutomationElement based on purple path provided
             var pathStrings = new List<string>(purplePath.Split(_delimiter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
             //RootElement starts on the desktop
             AutomationElement element = AutomationElement.RootElement;
             TreeWalker walker = TreeWalker.RawViewWalker;
             AutomationElement node = element;
-            Condition findCondition;
-            AutomationElementCollection allElements;
             List<AutomationElement> childElements;
             
             //We only want to browse down as far as we need to
             for (int i = 0; i < pathStrings.Count(); i++)
             {
-                findCondition = new PropertyCondition(AutomationElement.NameProperty, pathStrings[i], PropertyConditionFlags.IgnoreCase);
-                //I know we're going to get some app that used accessible names that end in brackets and fuck everything up
-                if (pathStrings[i].EndsWith("]"))
+                //The first path name will always be the app main window - we only want to match on the first part of the name since some apps will put the file path in the window name
+                
+                //If the path string has more than one child with the same name
+                if (pathStrings[i].EndsWith(_orderEnd.ToString()))
                 {
-                    int orderstart = pathStrings[i].IndexOf("[");
+                    int orderstart = pathStrings[i].IndexOf(_orderStart);
                     orderstart += 1; //the length of order start
-                    int orderend = pathStrings[i].IndexOf("]");
+                    int orderend = pathStrings[i].IndexOf(_orderEnd);
                     int length = orderend - orderstart;
                     int value = int.Parse(pathStrings[i].Substring(orderstart, length));
                     //find the start of the ordernumber
@@ -169,18 +191,41 @@ namespace PurpleLib
                     }
                     for (int x = 0; x < childElements.Count; x++)
                     {
-                        if (childElements[x].Current.Name == name)
+                        //We only want to do this fancy crap with the top level name since that should be the window name under the desktop
+                        if (i == 0)
                         {
-                            match++;
-                            if (match == value)
+                            //The first path name will always be the app main window - we only want to match on the first part of the name since some apps will put the file path in the window name
+                            //There should really never be two windows with the exact same name but i'm sure this will come up at some point
+                            if (childElements[x].Current.Name.Contains(_topLevelWindowName) && _topLevelWindowName != DEFAULTWINDOWNAME)
                             {
-                                //we found the right one
-                                node = childElements[x];
+                                match++;
+                                if (match == value)
+                                {
+                                    //we found the right one
+                                    node = childElements[x];
+                                }
                             }
+                        }
+                        else
+                        {
+                            //handle the blank names
+                            if (name == _blankValue)
+                            {
+                                name = "";
+                            }
+                           if (childElements[x].Current.Name == name)
+                            {
+                                match++;
+                                if (match == value)
+                                {
+                                    //we found the right one
+                                    node = childElements[x];
+                                }
+                            } 
                         }
                     }
 
-                }
+                }//endif More than one child with the same name
                 else
                 {
                     string name = pathStrings[i];
@@ -193,12 +238,29 @@ namespace PurpleLib
                     }
                     for (int x = 0; x < childElements.Count; x++)
                     {
-                        if (childElements[x].Current.Name == name)
+                        if (i == 0)
                         {
-                            node = childElements[x];
-                            //we just want the first match here, since there are sometimes hidden elements under the current element
-                            x = childElements.Count;
+                            if (childElements[x].Current.Name.Contains(_topLevelWindowName) && _topLevelWindowName != DEFAULTWINDOWNAME)
+                            {
+                                node = childElements[x];
+                                //we just want the first match here, since there are sometimes hidden elements under the current element
+                                x = childElements.Count;
+                            }
                         }
+                        else
+                        {
+                            if (name == _blankValue)
+                            {
+                                name = "";
+                            }
+                            if (childElements[x].Current.Name == name)
+                            {
+                                node = childElements[x];
+                                //we just want the first match here, since there are sometimes hidden elements under the current element
+                                x = childElements.Count;
+                            }
+                        }
+                        
                     }
 
                 }
@@ -211,9 +273,6 @@ namespace PurpleLib
             return node;
         }
 
-        public String getDelimiter()
-        {
-            return _delimiter;
-        }
+        
     }
 }
