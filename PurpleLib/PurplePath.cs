@@ -96,7 +96,7 @@ namespace PurpleLib
                     //check to see if we need to add on a value for number of items with the same damn name
                     if (childnum > 0)
                     {
-                        path += ConfigurationManager.AppSettings["OrderStart"] + childnum + ConfigurationManager.AppSettings["OrderEnd"];
+                        path += "[" + childnum + "]";
                     }
                     //add on the delimiter
                     path += _delimiter;

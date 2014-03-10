@@ -185,7 +185,8 @@ namespace Purple.ViewControllers
 
         public void testPath()
         {
-            AutomationElement thing = new PurplePath().FindElement("//LifeQuest™ Pipeline//Open//File name:[1]//File name://File name:");
+            AutomationElement thing = new PurplePath().FindElement("//LifeQuest™ Pipeline//Dock Top//Main Menu//Main_MenuFeatures//Main_MenuFeatureConstructionFeatures//Main_MenuFeatureUnknown");
+            //thing.SetFocus();
         }
         
 
