@@ -183,7 +183,11 @@ namespace Purple.ViewControllers
         }
         #endregion
 
-
+        public void testPath()
+        {
+            var path = new PurplePath().FindElement("//LifeQuest™ Pipeline//Open//File name://File name://File name:");
+        }
+        
 
 
 

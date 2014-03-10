@@ -34,7 +34,7 @@ namespace PurpleLib
             //I was curious how UI automation would handle having more than one panel with a blank name from Inspect.exe when building this path
             //It was surpriseing to know that the TreeWalker handles that for us when we walk up the tree, and conversly down the tree.
             //TODO: handle title bars like LQP where the title name changes based on the file opened
-            TreeWalker walker = TreeWalker.ContentViewWalker;
+            TreeWalker walker = TreeWalker.RawViewWalker;
             bool parentExists = true; //need to assume that there's a parent
             String path = element.Current.Name + _delimiter;
             AutomationElement parent;
@@ -74,12 +74,12 @@ namespace PurpleLib
 
         public AutomationElement FindElement(String purplePath)
         {
+            
             //This function will return a AutomationElement based on purple path provided
-            var pathStrings =
-                new List<string>(purplePath.Split(_delimiter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
+            var pathStrings = new List<string>(purplePath.Split(_delimiter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
 
             AutomationElement element = AutomationElement.RootElement;
-            TreeWalker walker = TreeWalker.ContentViewWalker;
+            TreeWalker walker = TreeWalker.RawViewWalker;
             AutomationElement node = element;
             Condition findCondition;
 
@@ -91,13 +91,20 @@ namespace PurpleLib
                 }
                 findCondition = new PropertyCondition(AutomationElement.NameProperty, pathStrings[i],
                     PropertyConditionFlags.IgnoreCase);
+               
                 node = element.FindFirst(TreeScope.Children, findCondition);
+                var nodename = node.Current.Name;
                 if (node != null)
                 {
                     element = node;
                 }
             }
             return node;
+        }
+
+        public String getDelimiter()
+        {
+            return _delimiter;
         }
     }
 }
