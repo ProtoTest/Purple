@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Windows.Automation;
 
@@ -17,12 +18,12 @@ namespace PurpleLib
 
         public PurplePath(String delimiter = DELIMITER, String blank = BLANK)
         {
-            _delimiter = ConfigurationManager.AppSettings[DELIMITER];
+            _delimiter = ConfigurationManager.AppSettings["Delimiter"];
             if (_delimiter == null)
             {
                 _delimiter = delimiter;
             }
-            _blankValue = ConfigurationManager.AppSettings[BLANK];
+            _blankValue = ConfigurationManager.AppSettings["Blank"];
             if (_blankValue == null)
             {
                 _blankValue = blank;
@@ -35,24 +36,82 @@ namespace PurpleLib
             //It was surpriseing to know that the TreeWalker handles that for us when we walk up the tree, and conversly down the tree.
             //TODO: handle title bars like LQP where the title name changes based on the file opened
             TreeWalker walker = TreeWalker.RawViewWalker;
+            TreeWalker walkDown = TreeWalker.RawViewWalker;
             bool parentExists = true; //need to assume that there's a parent
-            String path = element.Current.Name + _delimiter;
+            String path = element.Current.Name;
             AutomationElement parent;
             AutomationElement node = element;
             String purplePath = "";
+            AutomationElementCollection allchildelements;
+            string parentName = node.Current.Name;
 
+            //HOLY HELL - FINALLY got this working i think
             while (parentExists)
             {
+                int childnum = 0;
+                int matches = 0;
+                
+                //get the parent item of the found item
                 parent = walker.GetParent(node);
                 if (parent != null)
                 {
-                    string parentName = parent.Current.Name;
+                    //list to store children of parent of item
+                    List<AutomationElement> ChildrenFromParent = new List<AutomationElement>();
+                    bool childexists = true;
+                    while (childexists)
+                    {
+                        //get the first child of the parent of the item
+                        AutomationElement sibling = walkDown.GetFirstChild(parent);
+                        if (sibling != null)
+                        {
+                            //add the first child to the list
+                            ChildrenFromParent.Add(sibling);
+                            //get the next sibling
+                            AutomationElement nextSibling = walkDown.GetNextSibling(sibling);
+                            while (nextSibling != null)
+                            {
+                                //get all the children of the item
+                               ChildrenFromParent.Add(nextSibling);
+                               nextSibling = walkDown.GetNextSibling(nextSibling);
+                            }
+                        }
+                        //stop the 3rd loop when all the siblings of the item are found
+                        childexists = false;
+                    }
+                    //check the names of each of the siblings
+                    for (int x = 0; x < ChildrenFromParent.Count; x++)
+                    {
+                        //Check if the name matches
+                        if (node.Current.Name == ChildrenFromParent[x].Current.Name)
+                        {
+                            //increment the number of matches
+                            matches++;
+                            if (node.Current.Equals(ChildrenFromParent[x].Current))
+                            {
+                                //the matches will correspond with the number of matches -1 to give us a path were we dont' have to do any evaluations if there are no names exactly the same
+                                childnum = matches - 1;
+                            }
+                        }
+                    }
+                    //check to see if we need to add on a value for number of items with the same damn name
+                    if (childnum > 0)
+                    {
+                        path += ConfigurationManager.AppSettings["OrderStart"] + childnum + ConfigurationManager.AppSettings["OrderEnd"];
+                    }
+                    //add on the delimiter
+                    path += _delimiter;
+                    parentName = parent.Current.Name;
+                    
+                    //now we have to find out if the parent name contains a blank --another great 'feature' of windows UI automation
+                    //if the first char in the parentName at this point is [ we know it's one of at least 2 blanks
                     if (parentName == "")
                     {
                         //We need to put something for blanks
                         parentName = _blankValue;
                     }
-                    path += parentName + _delimiter;
+                    
+                    //now add it to the path
+                    path += parentName; //Dont put the delimiter here
                     node = parent;
                 }
                 else
@@ -77,22 +136,72 @@ namespace PurpleLib
             
             //This function will return a AutomationElement based on purple path provided
             var pathStrings = new List<string>(purplePath.Split(_delimiter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
-
+            //RootElement starts on the desktop
             AutomationElement element = AutomationElement.RootElement;
             TreeWalker walker = TreeWalker.RawViewWalker;
             AutomationElement node = element;
             Condition findCondition;
-
+            AutomationElementCollection allElements;
+            List<AutomationElement> childElements;
+            
+            //We only want to browse down as far as we need to
             for (int i = 0; i < pathStrings.Count(); i++)
             {
-                if (pathStrings[i].Equals(_blankValue))
+                findCondition = new PropertyCondition(AutomationElement.NameProperty, pathStrings[i], PropertyConditionFlags.IgnoreCase);
+                //I know we're going to get some app that used accessible names that end in brackets and fuck everything up
+                if (pathStrings[i].EndsWith("]"))
                 {
-                    pathStrings[i] = "";
+                    int orderstart = pathStrings[i].IndexOf("[");
+                    orderstart += 1; //the length of order start
+                    int orderend = pathStrings[i].IndexOf("]");
+                    int length = orderend - orderstart;
+                    int value = int.Parse(pathStrings[i].Substring(orderstart, length));
+                    //find the start of the ordernumber
+                    string name = pathStrings[i].Substring(0, orderstart - 1);
+                    int match = -1;
+
+                    childElements = new List<AutomationElement>();
+                    node = walker.GetFirstChild(element);
+                    while (node != null)
+                    {
+                        childElements.Add(node);
+                        node = walker.GetNextSibling(node);
+                    }
+                    for (int x = 0; x < childElements.Count; x++)
+                    {
+                        if (childElements[x].Current.Name == name)
+                        {
+                            match++;
+                            if (match == value)
+                            {
+                                //we found the right one
+                                node = childElements[x];
+                            }
+                        }
+                    }
+
                 }
-                findCondition = new PropertyCondition(AutomationElement.NameProperty, pathStrings[i],
-                    PropertyConditionFlags.IgnoreCase);
-               
-                node = element.FindFirst(TreeScope.Children, findCondition);
+                else
+                {
+                    string name = pathStrings[i];
+                    childElements = new List<AutomationElement>();
+                    node = walker.GetFirstChild(element);
+                    while (node != null)
+                    {
+                        childElements.Add(node);
+                        node = walker.GetNextSibling(node);
+                    }
+                    for (int x = 0; x < childElements.Count; x++)
+                    {
+                        if (childElements[x].Current.Name == name)
+                        {
+                            node = childElements[x];
+                            //we just want the first match here, since there are sometimes hidden elements under the current element
+                            x = childElements.Count;
+                        }
+                    }
+
+                }
                 var nodename = node.Current.Name;
                 if (node != null)
                 {
