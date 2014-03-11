@@ -30,6 +30,7 @@ namespace Purple.ViewControllers
         
         //General Options for PurpleUI
         private StartOptions _Options = new StartOptions();
+        private PurplePath _purpleLocator = new PurplePath();
 
         private int _PreviousXLoc;
         private int _PreviousYLoc;
@@ -52,6 +53,16 @@ namespace Purple.ViewControllers
             _ElementLocList = new List<Point>();
             _Location = new Point();
             _CachefileBuilder = new UIA_ElementCacher();
+            ConfigurePurpleLocator();
+        }
+
+        public void ConfigurePurpleLocator()
+        {
+            _purpleLocator.DefaultWindowName = ConfigurationManager.AppSettings["Purple_WindowTitle"];
+            _purpleLocator.BlankValue = ConfigurationManager.AppSettings["Purple_BlankValue"];
+            _purpleLocator.Delimiter = ConfigurationManager.AppSettings["Purple_Delimiter"];
+            _purpleLocator.ValueDelimiterEnd = ConfigurationManager.AppSettings["Purple_ValueDelimiterEnd"];
+            _purpleLocator.ValueDelimiterStart = ConfigurationManager.AppSettings["Purple_ValueDelimiterStart"];
         }
         #region ElementFinding functions for finding elements and displaying paths
         public void AddPoint(Point value)
@@ -69,16 +80,7 @@ namespace Purple.ViewControllers
                 AutomationElement element = AutomationElement.FromPoint(_ElementLocList.Last());
                 if (element != null)
                 {
-                    //Check to see if we have a default window parameter set
-                    if (_Options.UseDefaultWindow)
-                    {
-                        _foundElement = new UIA_ElementInfo(_ElementLocList.Last(), element, _Options.DefaultWindow);
-                    }
-                    else
-                    {
-                       _foundElement = new UIA_ElementInfo(_ElementLocList.Last(), element); 
-                    }
-                    
+                    _foundElement = new UIA_ElementInfo(_ElementLocList.Last(), element, _purpleLocator);
                     //setting this for use with other functions
                     elementFound = true;
                 }
@@ -220,11 +222,7 @@ namespace Purple.ViewControllers
 
         public void testPath()
         {
-            PurplePath Finder = new PurplePath();
-            Finder.DefaultWindowName = "LifeQuest™ Pipeline";
-            Finder.ValueDelimiterStart = '<';
-            Finder.ValueDelimiterEnd = '>';
-            AutomationElement thing = Finder.FindElement("//LifeQuest™ Pipeline//!BLANK!//RLF2013TestFile.qig [2D]//LifeQuestBaseView_ViewBar//ViewBar_OptionsButton");
+            AutomationElement thing = _purpleLocator.FindElement("/LifeQuest™ Pipeline/!BLANK!/RLF2013TestFile.qig [2D]/LifeQuestBaseView_ViewBar/ViewBar_OptionsButton");
             if (thing != null)
             {
                 MessageBox.Show("Element Found!");

@@ -21,23 +21,15 @@ namespace PurpleLib
         
         public Point ElementLocation{get { return _ElementLocation; }}
 
-        public UIA_ElementInfo(Point loc, AutomationElement element, string windowName = "")
+        public UIA_ElementInfo(Point loc, AutomationElement element, PurplePath locator)
         {
             _uiaElement = element;
             _ElementLocation = loc;
             _ElementName = _uiaElement.Current.Name;
             _ElementAutomationID = _uiaElement.Current.AutomationId;
             _ElementType = _uiaElement.Current.LocalizedControlType;
-            if (windowName != "")
-            {
-                PurplePath locator = new PurplePath();
-                locator.DefaultWindowName = windowName;
-                _PurplePath = locator.getPurplePath(_uiaElement);
-            }
-            else
-            {
-                _PurplePath = new PurplePath().getPurplePath(_uiaElement);
-            }
+            _PurplePath = locator.getPurplePath(element);
+
         }
 
         public string[] Headers()

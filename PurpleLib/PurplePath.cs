@@ -14,22 +14,22 @@ namespace PurpleLib
         private const String DELIMITER = "//";
         private const String BLANK = "!BLANK!";
         private const String DEFAULTWINDOWNAME = "EMPTY";
-        private const char ORDERSTART = '[';
-        private const char ORDEREND = ']';
+        private const string ORDERSTART = "[";
+        private const string ORDEREND = "]";
 
         public String DefaultWindowName {set { _topLevelWindowName = value; }}
-        public char ValueDelimiterStart {set { _orderStart = value; }}
-        public char ValueDelimiterEnd {set { _orderEnd = value; }}
+        public string ValueDelimiterStart {set { _orderStart = value; }}
+        public string ValueDelimiterEnd {set { _orderEnd = value; }}
         public String Delimiter {set { _delimiter = value; }}
         public String BlankValue {set { _blankValue = value; }}
 
         private String _blankValue = BLANK;
         private String _delimiter = DELIMITER;
         private string _topLevelWindowName = DEFAULTWINDOWNAME;
-        private char _orderStart = ORDERSTART;
-        private char _orderEnd = ORDEREND;
+        private string _orderStart = ORDERSTART;
+        private string _orderEnd = ORDEREND;
 
-        public PurplePath(char orderstart = ORDERSTART, char orderend = ORDEREND, string wName = DEFAULTWINDOWNAME, String delimiter = DELIMITER, String blank = BLANK)
+        public PurplePath(string orderstart = ORDERSTART, string orderend = ORDEREND, string wName = DEFAULTWINDOWNAME, String delimiter = DELIMITER, String blank = BLANK)
         {
             _orderStart = orderstart;
             _orderEnd = orderend;
@@ -174,7 +174,7 @@ namespace PurpleLib
                 if (pathStrings[i].EndsWith(_orderEnd.ToString()))
                 {
                     int orderstart = pathStrings[i].IndexOf(_orderStart);
-                    orderstart += 1; //the length of order start
+                    orderstart += _orderStart.Length; //the length of order start
                     int orderend = pathStrings[i].IndexOf(_orderEnd);
                     int length = orderend - orderstart;
                     int value = int.Parse(pathStrings[i].Substring(orderstart, length));
