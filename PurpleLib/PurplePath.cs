@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Automation;
 
 namespace PurpleLib
@@ -17,11 +18,25 @@ namespace PurpleLib
         private const string ORDERSTART = "[";
         private const string ORDEREND = "]";
 
-        public String DefaultWindowName {set { _topLevelWindowName = value; }}
+        public String DefaultWindowName
+        {
+            set{ _topLevelWindowName = value; }
+            get { return _topLevelWindowName; }
+        }
+
         public string ValueDelimiterStart {set { _orderStart = value; }}
         public string ValueDelimiterEnd {set { _orderEnd = value; }}
-        public String Delimiter {set { _delimiter = value; }}
-        public String BlankValue {set { _blankValue = value; }}
+        public String Delimiter
+        {
+            set { _delimiter = value; }
+            get { return _delimiter; }
+        }
+
+        public String BlankValue
+        {
+            set { _blankValue = value; }
+            get { return _blankValue; }
+        }
 
         private String _blankValue = BLANK;
         private String _delimiter = DELIMITER;
@@ -70,28 +85,28 @@ namespace PurpleLib
                 if (parent != null)
                 {
                     //list to store children of parent of item
-                    List<AutomationElement> ChildrenFromParent = new List<AutomationElement>();
-                    bool childexists = true;
-                    while (childexists)
-                    {
-                        //get the first child of the parent of the item
-                        AutomationElement sibling = walkDown.GetFirstChild(parent);
-                        if (sibling != null)
-                        {
-                            //add the first child to the list
-                            ChildrenFromParent.Add(sibling);
-                            //get the next sibling
-                            AutomationElement nextSibling = walkDown.GetNextSibling(sibling);
-                            while (nextSibling != null)
-                            {
-                                //get all the children of the item
-                               ChildrenFromParent.Add(nextSibling);
-                               nextSibling = walkDown.GetNextSibling(nextSibling);
-                            }
-                        }
-                        //stop the 3rd loop when all the siblings of the item are found
-                        childexists = false;
-                    }
+                    List<AutomationElement> ChildrenFromParent = GetChildren(parent);
+                    //bool childexists = true;
+                    //while (childexists)
+                    //{
+                    //    //get the first child of the parent of the item
+                    //    AutomationElement sibling = walkDown.GetFirstChild(parent);
+                    //    if (sibling != null)
+                    //    {
+                    //        //add the first child to the list
+                    //        ChildrenFromParent.Add(sibling);
+                    //        //get the next sibling
+                    //        AutomationElement nextSibling = walkDown.GetNextSibling(sibling);
+                    //        while (nextSibling != null)
+                    //        {
+                    //            //get all the children of the item
+                    //            ChildrenFromParent.Add(nextSibling);
+                    //            nextSibling = walkDown.GetNextSibling(nextSibling);
+                    //        }
+                    //    }
+                    //    //stop the 3rd loop when all the siblings of the item are found
+                    //    childexists = false;
+                    //}
                     //check the names of each of the siblings
                     for (int x = 0; x < ChildrenFromParent.Count; x++)
                     {
@@ -173,6 +188,7 @@ namespace PurpleLib
                 //If the path string has more than one child with the same name
                 if (pathStrings[i].EndsWith(_orderEnd.ToString()))
                 {
+                    //This bit is to calculate the part of the string we're the value number is i.e. between the name[1] brackets
                     int orderstart = pathStrings[i].IndexOf(_orderStart);
                     orderstart += _orderStart.Length; //the length of order start
                     int orderend = pathStrings[i].IndexOf(_orderEnd);
@@ -226,22 +242,27 @@ namespace PurpleLib
                     }
 
                 }//endif More than one child with the same name
-                else
+                else //If there is not more than one element on the same level with the same name
                 {
                     string name = pathStrings[i];
                     childElements = new List<AutomationElement>();
+                    //this section get's all the siblings of the current node and adds them to a list
                     node = walker.GetFirstChild(element);
                     while (node != null)
                     {
                         childElements.Add(node);
                         node = walker.GetNextSibling(node);
                     }
+                    //then go through the list and find the element with a name that matches the current level of the purplepath
                     for (int x = 0; x < childElements.Count; x++)
                     {
+                        //If this is the first level only do a name partial name match -- to account for file names present in the window title
                         if (i == 0)
                         {
+                            //Only do the top level window match if the DEFAULTWINDOWNAME constant has been changed
                             if (childElements[x].Current.Name.Contains(_topLevelWindowName) && _topLevelWindowName != DEFAULTWINDOWNAME)
                             {
+                                //This is where we get the match
                                 node = childElements[x];
                                 //we just want the first match here, since there are sometimes hidden elements under the current element
                                 x = childElements.Count;
@@ -249,6 +270,7 @@ namespace PurpleLib
                         }
                         else
                         {
+
                             if (name == _blankValue)
                             {
                                 name = "";
@@ -257,6 +279,7 @@ namespace PurpleLib
                             {
                                 node = childElements[x];
                                 //we just want the first match here, since there are sometimes hidden elements under the current element
+                                //TODO: check this against ara's bug -- this might be a problem
                                 x = childElements.Count;
                             }
                         }
@@ -273,6 +296,45 @@ namespace PurpleLib
             return node;
         }
 
-        
+        public List<AutomationElement> GetChildren(AutomationElement parentElement)
+        {
+            List<AutomationElement> childElements = new List<AutomationElement>();
+            TreeWalker walkDown = TreeWalker.RawViewWalker;
+            bool childexists = true;
+            while (childexists)
+            {
+                //get the first child of the parent of the item
+                AutomationElement sibling = walkDown.GetFirstChild(parentElement);
+                if (sibling != null)
+                {
+                    //add the first child to the list
+                    childElements.Add(sibling);
+                    //get the next sibling
+                    AutomationElement nextSibling = walkDown.GetNextSibling(sibling);
+                    while (nextSibling != null)
+                    {
+                        //get all the children of the item
+                        childElements.Add(nextSibling);
+                        nextSibling = walkDown.GetNextSibling(nextSibling);
+                    }
+                }
+                //stop the 3rd loop when all the siblings of the item are found
+                childexists = false;
+            }
+            return childElements;
+        }
+
+        public bool HasChildren(AutomationElement element)
+        {
+            bool child = false;
+            TreeWalker children = TreeWalker.RawViewWalker;
+            if (children.GetFirstChild(element) != null)
+            {
+                child = true;
+            }
+            return child;
+        }
     }
+
+
 }

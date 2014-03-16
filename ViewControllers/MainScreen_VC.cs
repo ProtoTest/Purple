@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
@@ -19,6 +20,7 @@ using CheckBox = System.Windows.Controls.CheckBox;
 using DataGrid = System.Windows.Controls.DataGrid;
 using MessageBox = System.Windows.MessageBox;
 using TextBox = System.Windows.Controls.TextBox;
+using TreeView = System.Windows.Controls.TreeView;
 
 namespace Purple.ViewControllers
 {
@@ -31,6 +33,8 @@ namespace Purple.ViewControllers
         //General Options for PurpleUI
         private StartOptions _Options = new StartOptions();
         private PurplePath _purpleLocator = new PurplePath();
+        private AutomationElement parentElement;
+        public List<UIA_ElementInfo> ElementInfos;
 
         private int _PreviousXLoc;
         private int _PreviousYLoc;
@@ -53,6 +57,7 @@ namespace Purple.ViewControllers
             _ElementLocList = new List<Point>();
             _Location = new Point();
             _CachefileBuilder = new UIA_ElementCacher();
+            ElementInfos = new List<UIA_ElementInfo>();
             ConfigurePurpleLocator();
         }
 
@@ -64,7 +69,7 @@ namespace Purple.ViewControllers
             _purpleLocator.ValueDelimiterEnd = ConfigurationManager.AppSettings["Purple_ValueDelimiterEnd"];
             _purpleLocator.ValueDelimiterStart = ConfigurationManager.AppSettings["Purple_ValueDelimiterStart"];
         }
-        #region ElementFinding functions for finding elements and displaying paths
+        #region DataGrid functions for finding elements and displaying paths 
         public void AddPoint(Point value)
         {
             _Location.X = value.X;
@@ -189,6 +194,47 @@ namespace Purple.ViewControllers
 
         #endregion
 
+        #region TreeViewBuilder
+
+        public List<UIA_ElementInfo> BuildApplicationTree(UIA_ElementInfo parent = null)
+        {
+            //I hate recursive functions
+            TreeWalker walker = TreeWalker.RawViewWalker;
+            if (parent == null)
+            {
+                parentElement = _purpleLocator.FindElement(_purpleLocator.Delimiter + _purpleLocator.DefaultWindowName);
+                parent = new UIA_ElementInfo(parentElement, _purpleLocator);
+            }
+            else
+            {
+                parentElement = parent.AElement;
+                parent.Children.Clear();
+            }
+            AutomationElement node = parentElement;
+            
+            
+            //Get all the children of the first node
+            node = walker.GetFirstChild(parentElement);
+            while (node != null)
+            {
+                UIA_ElementInfo child = new UIA_ElementInfo(node, _purpleLocator);
+                child.BuildNextLevel();
+                parent.Children.Add(child);
+                node = walker.GetNextSibling(node);
+            }
+            
+            ElementInfos.Add(parent);
+            
+            return ElementInfos;
+        }
+        
+        public void BuildChildTree(UIA_ElementInfo item, object sender, RoutedEventArgs e)
+        {
+            item.Children = BuildApplicationTree(item);
+        }
+
+        #endregion
+
 
         #region TestFunctions
         public void AttemptClick()
@@ -217,9 +263,7 @@ namespace Purple.ViewControllers
             {
                 _foundElement.patterns();
             }
-        }
-        #endregion
-
+        } 
         public void testPath()
         {
             AutomationElement thing = _purpleLocator.FindElement("/LifeQuest™ Pipeline/!BLANK!/RLF2013TestFile.qig [2D]/LifeQuestBaseView_ViewBar/ViewBar_OptionsButton");
@@ -228,6 +272,9 @@ namespace Purple.ViewControllers
                 MessageBox.Show("Element Found!");
             }
         }
+        #endregion
+
+       
         
 
 

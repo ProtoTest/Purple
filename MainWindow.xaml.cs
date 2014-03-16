@@ -1,12 +1,19 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
+using System.Linq;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Data;
 using MouseKeyboardLibrary;
+using Purple.DataHandlers;
+using System.Windows.Forms;
 using Purple.ViewControllers;
+using PurpleLib;
+using Control = System.Windows.Forms.Control;
 using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
 namespace Purple
@@ -24,6 +31,7 @@ namespace Purple
 
         //Initialize View Controllers
         private MainScreen_VC mainScreenVc = new MainScreen_VC();
+        public List<UIA_ElementInfo> Elements; 
 
         #region MouseHandlers Code to handle mouse driven events on the MainScreen
         //For some reason i couldn't pass around MouseEventArgs properly.  Bah! --Had to include it in the main form class.  
@@ -60,8 +68,10 @@ namespace Purple
         private void Purple_MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             //This function fires when the window is first loaded
-            OptionsExpander.BorderBrush.Opacity = 0;
-            mainScreenVc.SetOptions(ref PurpleStartingPath, ref Options_StartingWindow);
+            Elements = mainScreenVc.BuildApplicationTree();
+            ApplicationTree.ItemsSource = Elements;
+            //ApplicationTree.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(mainScreenVc.BuildChildTree));
+            
         }
 
         private void Purple_MainWindow_Unloaded(object sender, RoutedEventArgs e)
@@ -95,31 +105,7 @@ namespace Purple
 
 
         #region Options Code to handle options expander
-        private void PurpleStartingPath_Checked(object sender, RoutedEventArgs e)
-        {
-            Options_StartingWindow.Visibility = Visibility.Visible;
-        }
-
-        private void PurpleStartingPath_Unchecked(object sender, RoutedEventArgs e)
-        {
-            Options_StartingWindow.Visibility = Visibility.Collapsed;
-        }
-
-        private void OptionsExpander_Collapsed(object sender, RoutedEventArgs e)
-        {
-            //for some stupid reason i have to hid the fucking border of the thing when it's collapsed
-            OptionsExpander.BorderBrush.Opacity = 0;
-            mainScreenVc.PersistOptions((bool) PurpleStartingPath.IsChecked, Options_StartingWindow.Text);
-        }
-        private void OptionsExpander_Expanded(object sender, RoutedEventArgs e)
-        {
-            OptionsExpander.BorderBrush.Opacity = 100;
-            
-        }
-        private void Options_StartingWindow_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            
-        }
+        
         #endregion
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -127,8 +113,23 @@ namespace Purple
             mainScreenVc.testPath();
         }
 
-        
+        private void ApplicationTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            UIA_ElementInfo thing = (UIA_ElementInfo) ApplicationTree.SelectedItem;
+            var what = ApplicationTree.Items.CurrentPosition;
+            ApplicationTree_OnExpanded(sender, e);
 
+        }
        
+        private void ApplicationTree_OnExpanded(object sender, RoutedEventArgs e)
+        {
+            mainScreenVc.BuildChildTree((UIA_ElementInfo)ApplicationTree.SelectedValue, sender, e);
+        }
+
+        private void TreeItem_GetInfo(object sender, RoutedEventArgs e)
+        {
+            UIA_ElementInfo thing = (UIA_ElementInfo)ApplicationTree.SelectedItem;
+            purplepathtextbox.Text = thing.Purplepath;
+        }
     }
 }
