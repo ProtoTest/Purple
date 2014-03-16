@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -19,6 +21,8 @@ using Binding = System.Windows.Data.Binding;
 using CheckBox = System.Windows.Controls.CheckBox;
 using DataGrid = System.Windows.Controls.DataGrid;
 using MessageBox = System.Windows.MessageBox;
+using Point = System.Windows.Point;
+using Size = System.Windows.Size;
 using TextBox = System.Windows.Controls.TextBox;
 using TreeView = System.Windows.Controls.TreeView;
 
@@ -35,6 +39,8 @@ namespace Purple.ViewControllers
         private PurplePath _purpleLocator = new PurplePath();
         private AutomationElement parentElement;
         public List<UIA_ElementInfo> ElementInfos;
+        private bool highlighted = false;
+        private Form highlightedElement = new Form();
 
         private int _PreviousXLoc;
         private int _PreviousYLoc;
@@ -48,6 +54,12 @@ namespace Purple.ViewControllers
 
         //Variables for UIAElements
         private UIA_ElementInfo _foundElement;
+
+        public UIA_ElementInfo FoundElement
+        {
+            get { return _foundElement; }
+            set { _foundElement = value;}
+        }
         private UIA_ElementCacher _CachefileBuilder;
         private bool elementFound = false;
 
@@ -164,6 +176,13 @@ namespace Purple.ViewControllers
             }
             dataGrid.ItemsSource = rows;
         }
+
+        public void ClearCachedElements(ref DataGrid datagrid)
+        {
+            datagrid.ItemsSource = null;
+            _CachefileBuilder.ElementsInCache.Clear();
+            BuildElementDG_Headers(ref datagrid);
+        }
         #endregion
 
         #region ConfigurationOptions
@@ -240,6 +259,56 @@ namespace Purple.ViewControllers
 
         #endregion
 
+        #region ElementInformation
+
+        public void SetElementDetail(ref TextBox purplePath_tb,
+            ref TextBox availinfo_cb,
+            ref CheckBox isenabled_cb,
+            ref CheckBox iskeyboard_cb,
+            ref CheckBox isoffscreen_cb,
+            ref TextBox processid_tb)
+        {
+            if (_foundElement != null)
+            {
+                purplePath_tb.Text = _foundElement.Purplepath;
+                availinfo_cb.Clear();
+                availinfo_cb.AppendText(_foundElement.Patterns);
+                isenabled_cb.IsChecked = _foundElement.IsEnabled;
+                iskeyboard_cb.IsChecked = _foundElement.IsKeyboard;
+                isoffscreen_cb.IsChecked = _foundElement.IsOffscreen;
+                processid_tb.Text = _foundElement.ProcessID;
+            }
+        }
+
+        public void drawRectangle()
+        {
+            if (_foundElement != null)
+            {
+                if (!highlighted)
+                {
+                    Rect locationonScreen = _foundElement.AElement.Current.BoundingRectangle;
+                    int locationHeight = (int) locationonScreen.Size.Height;
+                    int locationWidth = (int) locationonScreen.Size.Width;
+                    highlightedElement.TopMost = false;
+                    highlightedElement.FormBorderStyle = FormBorderStyle.None;
+                    highlightedElement.Size = new System.Drawing.Size(locationWidth, locationHeight);
+                    highlightedElement.AllowTransparency = true;
+                    highlightedElement.BackColor = System.Drawing.Color.DarkOrchid;
+                    highlightedElement.Opacity = .35;
+                    highlightedElement.ShowInTaskbar = false;
+                    highlightedElement.Show();
+                    highlightedElement.Location = new System.Drawing.Point((int) _foundElement.AElement.Current.BoundingRectangle.Location.X, (int) _foundElement.AElement.Current.BoundingRectangle.Location.Y);
+                    highlighted = true;
+                }
+                else
+                {
+                    highlightedElement.Visible = false;
+                    highlightedElement.Hide();
+                    highlighted = false;
+                }
+            }
+        }
+        #endregion
 
         #region TestFunctions
         public void AttemptClick()

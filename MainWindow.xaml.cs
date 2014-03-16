@@ -92,6 +92,8 @@ namespace Purple
             {
                 mainScreenVc.AddPoint(new Point(double.Parse(Xcord.Text), double.Parse(YCord.Text)));
                 mainScreenVc.GetElementInfo(ref purplepathtextbox);
+                mainScreenVc.SetElementDetail(ref purplepathtextbox, ref AvailableInfo_textbox, ref IsEnabled_Checkbox, ref IsKeyboardFocusable_checkbox, ref IsOffscreen_checkbox,
+                    ref ProcessID_textbox);
             }
         }
 
@@ -99,7 +101,7 @@ namespace Purple
         {
             if (!mouseHook.IsStarted)
             {
-                //mainScreenVc.SelectedElements_AddRow(ref Selected_Elements_Grid);
+                mainScreenVc.SelectedElements_AddRow(ref CachedElementsGrid);
             }
         }
 
@@ -129,13 +131,28 @@ namespace Purple
         private void TreeItem_GetInfo(object sender, RoutedEventArgs e)
         {
             UIA_ElementInfo thing = (UIA_ElementInfo)ApplicationTree.SelectedItem;
-            purplepathtextbox.Text = thing.Purplepath;
+            if (thing != null)
+            {
+                mainScreenVc.FoundElement = thing;
+                mainScreenVc.SetElementDetail(ref purplepathtextbox, ref AvailableInfo_textbox, ref IsEnabled_Checkbox, ref IsKeyboardFocusable_checkbox, ref IsOffscreen_checkbox,
+                    ref ProcessID_textbox);
+            }
         }
         #endregion
 
         private void CopyButton_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Clipboard.SetText(purplepathtextbox.Text);
+        }
+
+        private void ClearCache_button_Click(object sender, RoutedEventArgs e)
+        {
+            mainScreenVc.ClearCachedElements(ref CachedElementsGrid);
+        }
+
+        private void ShowElement_Click(object sender, RoutedEventArgs e)
+        {
+            mainScreenVc.drawRectangle();
         }
     }
 }
