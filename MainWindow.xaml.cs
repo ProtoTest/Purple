@@ -112,7 +112,7 @@ namespace Purple
         {
             mainScreenVc.testPath();
         }
-
+        #region MotherFuckingTreeView Event handlers for the goddamn treeview
         private void ApplicationTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             UIA_ElementInfo thing = (UIA_ElementInfo) ApplicationTree.SelectedItem;
@@ -131,5 +131,6 @@ namespace Purple
             UIA_ElementInfo thing = (UIA_ElementInfo)ApplicationTree.SelectedItem;
             purplepathtextbox.Text = thing.Purplepath;
         }
+        #endregion
     }
 }
