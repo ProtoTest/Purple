@@ -81,7 +81,7 @@ namespace Purple
         #endregion
         private void Cursor_Button_Click(object sender, RoutedEventArgs e)
         {
-            Found_Element_Grid.ItemsSource = null;
+            purplepathtextbox.Text = "PurplePath";
             mouseHook.Start();
         }
 
@@ -91,7 +91,7 @@ namespace Purple
             if (!mouseHook.IsStarted)
             {
                 mainScreenVc.AddPoint(new Point(double.Parse(Xcord.Text), double.Parse(YCord.Text)));
-                mainScreenVc.FoundElement_AddRow(ref Found_Element_Grid);
+                mainScreenVc.GetElementInfo(ref purplepathtextbox);
             }
         }
 
@@ -99,7 +99,7 @@ namespace Purple
         {
             if (!mouseHook.IsStarted)
             {
-                mainScreenVc.SelectedElements_AddRow(ref Selected_Elements_Grid);
+                //mainScreenVc.SelectedElements_AddRow(ref Selected_Elements_Grid);
             }
         }
 
@@ -132,5 +132,10 @@ namespace Purple
             purplepathtextbox.Text = thing.Purplepath;
         }
         #endregion
+
+        private void CopyButton_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Clipboard.SetText(purplepathtextbox.Text);
+        }
     }
 }

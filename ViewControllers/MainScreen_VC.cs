@@ -107,6 +107,11 @@ namespace Purple.ViewControllers
             AddFoundElement(ref dataGrid);
         }
 
+        public void GetElementInfo(ref TextBox textBox)
+        {
+            textBox.Text = _foundElement.Purplepath;
+        }
+
         private void BuildElementDG_Headers(ref DataGrid dataGrid)
         {
             DataGridTextColumn columnHeader = new DataGridTextColumn();
