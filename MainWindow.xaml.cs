@@ -23,15 +23,15 @@ namespace Purple
     /// </summary>
     public partial class MainWindow : Window
     {
+        //Initialize View Controllers
+        private MainScreen_VC mainScreenVc = new MainScreen_VC();
+        public List<UIA_ElementInfo> Elements;
+
         public MainWindow()
         {
             InitializeComponent();
             InitMouseEventHandlers();
         }
-
-        //Initialize View Controllers
-        private MainScreen_VC mainScreenVc = new MainScreen_VC();
-        public List<UIA_ElementInfo> Elements; 
 
         #region MouseHandlers Code to handle mouse driven events on the MainScreen
         //For some reason i couldn't pass around MouseEventArgs properly.  Bah! --Had to include it in the main form class.  
@@ -53,6 +53,7 @@ namespace Purple
 
         public void mouseHook_MouseDown(object sender, MouseEventArgs e)
         {
+            //TODO Findsome way to stop the mouse from actually clicking when attempting to get an element
             mouseHook.Stop();
             GatherElementDetail();
         }
@@ -62,23 +63,7 @@ namespace Purple
             Xcord.Text = e.X.ToString();
             YCord.Text = e.Y.ToString();
         }
-        #endregion
 
-        #region FormLoad and Exit events
-        private void Purple_MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            //This function fires when the window is first loaded
-            Elements = mainScreenVc.BuildApplicationTree();
-            ApplicationTree.ItemsSource = Elements;
-            //ApplicationTree.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(mainScreenVc.BuildChildTree));
-            
-        }
-
-        private void Purple_MainWindow_Unloaded(object sender, RoutedEventArgs e)
-        {
-            mainScreenVc.SaveSettings_OnExit();
-        }
-        #endregion
         private void Cursor_Button_Click(object sender, RoutedEventArgs e)
         {
             purplepathtextbox.Text = "PurplePath";
@@ -96,19 +81,24 @@ namespace Purple
                     ref ProcessID_textbox);
             }
         }
-
-        private void Add_Element_Selected_Click(object sender, RoutedEventArgs e)
-        {
-            if (!mouseHook.IsStarted)
-            {
-                mainScreenVc.SelectedElements_AddRow(ref CachedElementsGrid);
-            }
-        }
-
-
-        #region Options Code to handle options expander
-        
         #endregion
+
+        #region FormLoad and Exit events
+        private void Purple_MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            //This function fires when the window is first loaded
+            Elements = mainScreenVc.BuildApplicationTree();
+            ApplicationTree.ItemsSource = Elements;
+            //ApplicationTree.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(mainScreenVc.BuildChildTree));
+            
+        }
+        private void Purple_MainWindow_Unloaded(object sender, RoutedEventArgs e)
+        {
+            mainScreenVc.SaveSettings_OnExit();
+        }
+        #endregion
+        
+        #region UI EventHandler Functions
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -122,12 +112,10 @@ namespace Purple
             ApplicationTree_OnExpanded(sender, e);
 
         }
-       
         private void ApplicationTree_OnExpanded(object sender, RoutedEventArgs e)
         {
             mainScreenVc.BuildChildTree((UIA_ElementInfo)ApplicationTree.SelectedValue, sender, e);
         }
-
         private void TreeItem_GetInfo(object sender, RoutedEventArgs e)
         {
             UIA_ElementInfo thing = (UIA_ElementInfo)ApplicationTree.SelectedItem;
@@ -154,5 +142,14 @@ namespace Purple
         {
             mainScreenVc.drawRectangle();
         }
+
+        private void Add_Element_Selected_Click(object sender, RoutedEventArgs e)
+        {
+            if (!mouseHook.IsStarted)
+            {
+                mainScreenVc.SelectedElements_AddRow(ref CachedElementsGrid);
+            }
+        }
+        #endregion
     }
 }

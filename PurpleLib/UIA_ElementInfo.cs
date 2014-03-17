@@ -14,6 +14,7 @@ namespace PurpleLib
 {
     public class UIA_ElementInfo 
     {
+        //TODO this is the Model class in MVVM or one of them
         private AutomationElement _uiaElement;
         private Point _ElementLocation;
         private String _ElementName;

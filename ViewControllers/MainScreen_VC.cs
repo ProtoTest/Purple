@@ -33,35 +33,33 @@ namespace Purple.ViewControllers
         //The purpose of this class is to handle all interactions from the DataHandler Classes that need to be either updated from the UI or stored back in the data classes.
         //The UI classes should NEVER directly interact with the data storeage classes except through classes like this.  More screens need more view controllers but not more data classes.
         //Variables for mouse positions -- Mouse position stuff added to Golem PurpleBaseElement
-        
+        //TODO Refactor MainScreen_VC -- This may need to be ViewModel in MVVM
         //General Options for PurpleUI
         private StartOptions _Options = new StartOptions();
         private PurplePath _purpleLocator = new PurplePath();
         private AutomationElement parentElement;
-        public List<UIA_ElementInfo> ElementInfos;
         private bool highlighted = false;
         private Form highlightedElement = new Form();
-
+        private UIA_ElementCacher _CachefileBuilder;
         private int _PreviousXLoc;
         private int _PreviousYLoc;
         private bool _TrackerRunning;
         private Point _Location;
         private List<Point> _ElementLocList;
-
+        private UIA_ElementInfo _foundElement;
+        private bool elementFound = false;
         //Variables for DataGrids
         private string[] DataGridHeaders;
         private string[] DataGridRows;
 
+        public List<UIA_ElementInfo> ElementInfos;
+        
         //Variables for UIAElements
-        private UIA_ElementInfo _foundElement;
-
         public UIA_ElementInfo FoundElement
         {
             get { return _foundElement; }
             set { _foundElement = value;}
         }
-        private UIA_ElementCacher _CachefileBuilder;
-        private bool elementFound = false;
 
         //Constructor
         public MainScreen_VC()
@@ -81,6 +79,7 @@ namespace Purple.ViewControllers
             _purpleLocator.ValueDelimiterEnd = ConfigurationManager.AppSettings["Purple_ValueDelimiterEnd"];
             _purpleLocator.ValueDelimiterStart = ConfigurationManager.AppSettings["Purple_ValueDelimiterStart"];
         }
+
         #region DataGrid functions for finding elements and displaying paths 
         public void AddPoint(Point value)
         {
