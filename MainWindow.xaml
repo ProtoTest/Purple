@@ -4,7 +4,7 @@
         xmlns:purpleLib="clr-namespace:PurpleLib;assembly=PurpleLib"
         Title="ProtoTest - Purple" Height="536" Width="948" Background="#FF63166A" ResizeMode="CanResizeWithGrip" Loaded="Purple_MainWindow_Loaded" Unloaded="Purple_MainWindow_Unloaded" MinWidth="523" MinHeight="200">
     <Grid Background="#7F4D136E" Margin="0,30,0,7">
-        <Grid HorizontalAlignment="Right" Width="505" Background="#FF3E044F">
+        <Grid HorizontalAlignment="Right" Width="505" Background="#FF3E044F" Margin="0,-1,0,1">
             <TabControl Margin="4,42,5,6" Background="#FF6F208D">
                 <TabItem Header="Element Info" Margin="-2,-2,-3,0" Background="#FFAD5CC5" BorderBrush="#FF1E0649">
                     <Grid Background="#FF6F208D" Margin="0,15,-4,-4">
@@ -41,7 +41,7 @@
                 <Button x:Name="ShowElement" Content="Highlight" HorizontalAlignment="Left" Margin="332,4,0,0" VerticalAlignment="Top" Width="75" Click="ShowElement_Click"/>
             </Grid>
         </Grid>
-        <Grid x:Name="TreeViewGrid" Background="#FF3E044F" Margin="9,0,510,0">
+        <Grid x:Name="TreeViewGrid" Background="#FF3E044F" Margin="9,-1,510,1">
             <TreeView x:Name="ApplicationTree" Margin="4,43,5,5" Background="#FFEAC5EE" SelectedItemChanged="ApplicationTree_SelectedItemChanged" TreeViewItem.Expanded="ApplicationTree_OnExpanded">
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type purpleLib:UIA_ElementInfo}" ItemsSource="{Binding Children}">
@@ -55,8 +55,12 @@
                     </HierarchicalDataTemplate>
                 </TreeView.Resources>
             </TreeView>
-            <Grid Height="34" Margin="4,4,5,0" VerticalAlignment="Top" Background="#FF6F208D"/>
+            <Grid Height="34" Margin="4,4,5,0" VerticalAlignment="Top" Background="#FF6F208D">
+                <Button x:Name="RefreshButton" Content="Refresh" HorizontalAlignment="Left" Margin="6,6,0,0" VerticalAlignment="Top" Width="75" Click="RefreshButton_Click"/>
+                <TextBox x:Name="ApplicationTextBox" HorizontalAlignment="Left" Height="23" Margin="96,5,0,0" TextWrapping="Wrap" Text="Application Name" VerticalAlignment="Top" Width="283"/>
+            </Grid>
         </Grid>
+        <Label Content="v1.0" HorizontalAlignment="Left" Margin="897,-28,0,0" VerticalAlignment="Top" Foreground="#FFA03AF5"/>
 
     </Grid>
 </Window>

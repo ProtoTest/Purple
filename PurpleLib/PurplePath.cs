@@ -64,7 +64,6 @@ namespace PurpleLib
         {
             //I was curious how UI automation would handle having more than one panel with a blank name from Inspect.exe when building this path
             //It was surpriseing to know that the TreeWalker handles that for us when we walk up the tree, and conversly down the tree.
-            
             TreeWalker walker = TreeWalker.RawViewWalker;
             TreeWalker walkDown = TreeWalker.RawViewWalker;
             bool parentExists = true; //need to assume that there's a parent
@@ -86,27 +85,6 @@ namespace PurpleLib
                 {
                     //list to store children of parent of item
                     List<AutomationElement> ChildrenFromParent = GetChildren(parent);
-                    //bool childexists = true;
-                    //while (childexists)
-                    //{
-                    //    //get the first child of the parent of the item
-                    //    AutomationElement sibling = walkDown.GetFirstChild(parent);
-                    //    if (sibling != null)
-                    //    {
-                    //        //add the first child to the list
-                    //        ChildrenFromParent.Add(sibling);
-                    //        //get the next sibling
-                    //        AutomationElement nextSibling = walkDown.GetNextSibling(sibling);
-                    //        while (nextSibling != null)
-                    //        {
-                    //            //get all the children of the item
-                    //            ChildrenFromParent.Add(nextSibling);
-                    //            nextSibling = walkDown.GetNextSibling(nextSibling);
-                    //        }
-                    //    }
-                    //    //stop the 3rd loop when all the siblings of the item are found
-                    //    childexists = false;
-                    //}
                     //check the names of each of the siblings
                     for (int x = 0; x < ChildrenFromParent.Count; x++)
                     {
@@ -270,7 +248,6 @@ namespace PurpleLib
                         }
                         else
                         {
-
                             if (name == _blankValue)
                             {
                                 name = "";

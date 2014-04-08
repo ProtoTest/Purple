@@ -41,6 +41,7 @@ namespace Purple.ViewControllers
         public List<UIA_ElementInfo> ElementInfos;
         private bool highlighted = false;
         private Form highlightedElement = new Form();
+        private bool ConfiguredAppNotRunning = false;
 
         private int _PreviousXLoc;
         private int _PreviousYLoc;
@@ -216,6 +217,20 @@ namespace Purple.ViewControllers
             defName.Text = _Options.DefaultWindow;
         }
 
+        public string getConfigAppName()
+        {
+            string returnval = "";
+            if (ConfiguredAppNotRunning)
+            {
+                returnval = ConfigurationManager.AppSettings["DefaultStartScreen"] + " is not currently running";
+            }
+            else
+            {
+                returnval = ConfigurationManager.AppSettings["DefaultStartScreen"];
+            }
+            return returnval;
+        }
+
         #endregion
 
         #region TreeViewBuilder
@@ -224,37 +239,57 @@ namespace Purple.ViewControllers
         {
             //I hate recursive functions
             TreeWalker walker = TreeWalker.RawViewWalker;
+            ConfiguredAppNotRunning = false;
+            
             if (parent == null)
             {
-                parentElement = _purpleLocator.FindElement(_purpleLocator.Delimiter + _purpleLocator.DefaultWindowName);
-                parent = new UIA_ElementInfo(parentElement, _purpleLocator);
+                try
+                {
+                    parentElement = _purpleLocator.FindElement(_purpleLocator.Delimiter + _purpleLocator.DefaultWindowName);
+                    parent = new UIA_ElementInfo(parentElement, _purpleLocator);
+                }
+                catch (Exception)
+                {
+                    ConfiguredAppNotRunning = true;
+                }
             }
             else
             {
                 parentElement = parent.AElement;
                 parent.Children.Clear();
             }
-            AutomationElement node = parentElement;
-            
-            
-            //Get all the children of the first node
-            node = walker.GetFirstChild(parentElement);
-            while (node != null)
+            if (!ConfiguredAppNotRunning)
             {
-                UIA_ElementInfo child = new UIA_ElementInfo(node, _purpleLocator);
-                child.BuildNextLevel();
-                parent.Children.Add(child);
-                node = walker.GetNextSibling(node);
+                AutomationElement node = parentElement;
+                //Get all the children of the first node
+                node = walker.GetFirstChild(parentElement);
+                while (node != null)
+                {
+                    UIA_ElementInfo child = new UIA_ElementInfo(node, _purpleLocator);
+                    child.BuildNextLevel();
+                    parent.Children.Add(child);
+                    node = walker.GetNextSibling(node);
+                }
+
+                ElementInfos.Add(parent);
             }
-            
-            ElementInfos.Add(parent);
-            
+
             return ElementInfos;
         }
         
         public void BuildChildTree(UIA_ElementInfo item, object sender, RoutedEventArgs e)
         {
             item.Children = BuildApplicationTree(item);
+        }
+
+        public List<UIA_ElementInfo> RefreshTreeView(string WindowName)
+        {
+            if (WindowName != ConfigurationManager.AppSettings["DefaultStartScreen"])
+            {
+                _purpleLocator.DefaultWindowName = WindowName;
+            }
+            ElementInfos.Clear();
+            return BuildApplicationTree();
         }
 
         #endregion
@@ -340,7 +375,7 @@ namespace Purple.ViewControllers
         } 
         public void testPath()
         {
-            AutomationElement thing = _purpleLocator.FindElement("/LifeQuest™ Pipeline/!BLANK!/RLF2013TestFile.qig [2D]/LifeQuestBaseView_ViewBar/ViewBar_OptionsButton");
+            AutomationElement thing = _purpleLocator.FindElement("/LifeQuest™ Pipeline/!BLANK!/RLF2013TestFile.qig [2D]/ViewSpecial2D_ViewPanel/!BLANK!/!BLANK!/Visualization Toolkit - Win32OpenGL #2");
             if (thing != null)
             {
                 MessageBox.Show("Element Found!");

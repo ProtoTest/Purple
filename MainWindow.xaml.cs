@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
@@ -16,12 +18,13 @@ using PurpleLib;
 using Control = System.Windows.Forms.Control;
 using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
+
 namespace Purple
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         public MainWindow()
         {
@@ -31,7 +34,8 @@ namespace Purple
 
         //Initialize View Controllers
         private MainScreen_VC mainScreenVc = new MainScreen_VC();
-        public List<UIA_ElementInfo> Elements; 
+        public List<UIA_ElementInfo> Elements;
+        
 
         #region MouseHandlers Code to handle mouse driven events on the MainScreen
         //For some reason i couldn't pass around MouseEventArgs properly.  Bah! --Had to include it in the main form class.  
@@ -68,8 +72,10 @@ namespace Purple
         private void Purple_MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             //This function fires when the window is first loaded
+
             Elements = mainScreenVc.BuildApplicationTree();
             ApplicationTree.ItemsSource = Elements;
+            ApplicationTextBox.Text = mainScreenVc.getConfigAppName();
             //ApplicationTree.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(mainScreenVc.BuildChildTree));
             
         }
@@ -120,7 +126,6 @@ namespace Purple
             UIA_ElementInfo thing = (UIA_ElementInfo) ApplicationTree.SelectedItem;
             var what = ApplicationTree.Items.CurrentPosition;
             ApplicationTree_OnExpanded(sender, e);
-
         }
        
         private void ApplicationTree_OnExpanded(object sender, RoutedEventArgs e)
@@ -154,5 +159,21 @@ namespace Purple
         {
             mainScreenVc.drawRectangle();
         }
+
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ApplicationTextBox.Text.Contains(ConfigurationManager.AppSettings["DefaultStartScreen"]))
+            {
+                Elements = mainScreenVc.RefreshTreeView(ConfigurationManager.AppSettings["DefaultStartScreen"]);
+                ApplicationTextBox.Text = ConfigurationManager.AppSettings["DefaultStartScreen"];
+            }
+            else
+            {
+                Elements = mainScreenVc.RefreshTreeView(ApplicationTextBox.Text);
+            }
+            ApplicationTree.Items.Refresh();
+        }
+
+       
     }
 }

@@ -151,7 +151,8 @@ namespace PurpleLib
             AutomationPattern[] automationPatterns = _uiaElement.GetSupportedPatterns();
             foreach (var automationPattern in automationPatterns)
             {
-                _patterns += automationPattern.ProgrammaticName + "\n";
+                _patterns += automationPattern.ProgrammaticName + "\n Pattern Name: ";
+                _patterns += Automation.PatternName(automationPattern) + "\n";
             }
             BuildPropertyValues();
         }
