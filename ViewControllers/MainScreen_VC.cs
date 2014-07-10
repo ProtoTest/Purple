@@ -287,6 +287,7 @@ namespace Purple.ViewControllers
             if (WindowName != ConfigurationManager.AppSettings["DefaultStartScreen"])
             {
                 _purpleLocator.DefaultWindowName = WindowName;
+                ConfiguredAppNotRunning = false;
             }
             ElementInfos.Clear();
             return BuildApplicationTree();
