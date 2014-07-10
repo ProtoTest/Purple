@@ -239,7 +239,7 @@ namespace Purple.ViewControllers
         {
             //I hate recursive functions
             TreeWalker walker = TreeWalker.RawViewWalker;
-            ConfiguredAppNotRunning = false;
+            //ConfiguredAppNotRunning = false;
             
             if (parent == null)
             {
@@ -344,44 +344,24 @@ namespace Purple.ViewControllers
             }
         }
         #endregion
-
-        #region TestFunctions
-        public void AttemptClick()
+        
+        public void TestPurplePath(string purplePath)
         {
-            if (elementFound)
+            //This is the code to find an element from the purplepathTextBox
+            if (_purpleLocator.ValidPath(purplePath))
             {
-                uint X = (uint) _foundElement.ElementLocation.X;
-                uint Y = (uint) _foundElement.ElementLocation.Y;
-                //SetCursorPos(X, Y);
-                //mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-                //mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                AutomationElement thing = _purpleLocator.FindElement(purplePath);
+                if (thing != null)
+                {
+                    MessageBox.Show("Element Found!");
+                }
+            }
+            else
+            {
+                MessageBox.Show("PurplePath Textbox does not contain a valid value.", "Um...", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-        public void AttemptKeyboard()
-        {
-            if (elementFound)
-            {   _foundElement.setfocus();
-                SendKeys.SendWait("Here's a message");
-            }
-        }
-
-        public void testpatterns()
-        {
-            if (elementFound)
-            {
-                _foundElement.patterns();
-            }
-        } 
-        public void testPath()
-        {
-            AutomationElement thing = _purpleLocator.FindElement("/LifeQuest™ Pipeline/!BLANK!/RLF2013TestFile.qig [2D]/ViewSpecial2D_ViewPanel/!BLANK!/!BLANK!/Visualization Toolkit - Win32OpenGL #2");
-            if (thing != null)
-            {
-                MessageBox.Show("Element Found!");
-            }
-        }
-        #endregion
+        
 
        
         

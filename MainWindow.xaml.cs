@@ -66,30 +66,6 @@ namespace Purple
             Xcord.Text = e.X.ToString();
             YCord.Text = e.Y.ToString();
         }
-        #endregion
-
-        #region FormLoad and Exit events
-        private void Purple_MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            //This function fires when the window is first loaded
-
-            Elements = mainScreenVc.BuildApplicationTree();
-            ApplicationTree.ItemsSource = Elements;
-            ApplicationTextBox.Text = mainScreenVc.getConfigAppName();
-            //ApplicationTree.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(mainScreenVc.BuildChildTree));
-            
-        }
-
-        private void Purple_MainWindow_Unloaded(object sender, RoutedEventArgs e)
-        {
-            mainScreenVc.SaveSettings_OnExit();
-        }
-        #endregion
-        private void Cursor_Button_Click(object sender, RoutedEventArgs e)
-        {
-            purplepathtextbox.Text = "PurplePath";
-            mouseHook.Start();
-        }
 
         private void GatherElementDetail()
         {
@@ -102,24 +78,30 @@ namespace Purple
                     ref ProcessID_textbox);
             }
         }
+        #endregion
 
-        private void Add_Element_Selected_Click(object sender, RoutedEventArgs e)
+        #region FormLoad and Exit events
+        private void Purple_MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!mouseHook.IsStarted)
-            {
-                mainScreenVc.SelectedElements_AddRow(ref CachedElementsGrid);
-            }
+            //This function fires when the window is first loaded
+            
+            Elements = mainScreenVc.BuildApplicationTree();
+            ApplicationTree.ItemsSource = Elements;
+            ApplicationTextBox.Text = mainScreenVc.getConfigAppName();
+            //ApplicationTree.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(mainScreenVc.BuildChildTree));
+            
         }
 
-
+        private void Purple_MainWindow_Unloaded(object sender, RoutedEventArgs e)
+        {
+            mainScreenVc.SaveSettings_OnExit();
+        }
+        #endregion
+        
         #region Options Code to handle options expander
         
         #endregion
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            mainScreenVc.testPath();
-        }
+        
         #region MotherFuckingTreeView Event handlers for the goddamn treeview
         private void ApplicationTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
@@ -144,6 +126,27 @@ namespace Purple
             }
         }
         #endregion
+
+        #region Buttons on Main Form
+
+        private void Cursor_Button_Click(object sender, RoutedEventArgs e)
+        {
+            purplepathtextbox.Text = "PurplePath";
+            mouseHook.Start();
+        }
+
+        private void Add_Element_Selected_Click(object sender, RoutedEventArgs e)
+        {
+            if (!mouseHook.IsStarted)
+            {
+                mainScreenVc.SelectedElements_AddRow(ref CachedElementsGrid);
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            mainScreenVc.TestPurplePath(purplepathtextbox.Text);
+        }
 
         private void CopyButton_Click(object sender, RoutedEventArgs e)
         {
@@ -173,7 +176,7 @@ namespace Purple
             }
             ApplicationTree.Items.Refresh();
         }
+        #endregion
 
-       
     }
 }

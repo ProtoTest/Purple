@@ -311,6 +311,13 @@ namespace PurpleLib
             }
             return child;
         }
+
+        public bool ValidPath(string path)
+        {
+            bool valid;
+            valid = path.Contains(DEFAULTWINDOWNAME);
+            return valid;
+        }
     }
 
 
