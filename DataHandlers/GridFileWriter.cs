@@ -15,17 +15,51 @@ namespace Purple.DataHandlers
         //This class will be used to build files with data contained in a DataGrid
         private List<UIA_ElementInfo> _cachedElements;
         public List<UIA_ElementInfo> ListofElements {set { _cachedElements = value; }}
-        private Stream streamer;
-        private StreamWriter sw;
+        private StreamWriter streamWriter;
+        
+        //Constants for PurpleElement Types
+        private const string PURUNKNOWN = "UnknownType";
+        private const string PURBUTTON = "PurpleButton";
+        private const string PURTEXTBOX = "PurpleTextBox";
+        private const string PURWINDOW = "PurpleWindow";
+        private const string VARLABEL = "var";
+        private const string CREATENEW = " = new ";
+        private int varnum = 0;
+
+        private const string COMMENTLINE =
+            "//Elements found using Purple UI - verify Golem.Purple settings match PurpleUI app.config before using\n\n";
+
 
         private void BuildFile(string filename)
         {
+            streamWriter = new StreamWriter(filename, false);
+            streamWriter.WriteLine(COMMENTLINE);
+            streamWriter.WriteLine(" ");
             
-            sw = new StreamWriter(filename, false);
-            
-            sw.WriteLine("Write this shit to the file fucker");
-            sw.Write("Maybe write this?");
-            sw.Close();
+            for (int i = 0; i < _cachedElements.Count; i++)
+            {
+                string ElementType = _cachedElements[i].elementData()[4];
+                string outputString = PURUNKNOWN + " " + VARLABEL + i + CREATENEW + PURUNKNOWN + "(\"" +
+                                      _cachedElements[i].elementData()[2] + "\", \"" +
+                                      _cachedElements[i].elementData()[5] + "\");";
+
+                if (ElementType == "button")
+                {
+                    outputString = outputString.Replace(PURUNKNOWN, PURBUTTON);
+                }
+                if (ElementType == "textbox")
+                {
+                    outputString = outputString.Replace(PURUNKNOWN, PURTEXTBOX);
+                }
+                if (ElementType == "window")
+                {
+                    outputString = outputString.Replace(PURUNKNOWN, PURWINDOW);
+                }
+                streamWriter.WriteLine(outputString);
+                
+            }
+           
+            streamWriter.Close();
 
         }
 
@@ -38,10 +72,7 @@ namespace Purple.DataHandlers
 
             if(svd.ShowDialog() == DialogResult.OK)
             {
-                
-                    BuildFile(svd.FileName);
-                    
-                
+                BuildFile(svd.FileName);
             }
 
 
