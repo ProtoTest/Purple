@@ -176,6 +176,13 @@ namespace Purple
             }
             ApplicationTree.Items.Refresh();
         }
+        
+        private void BuildCache_button_Click(object sender, RoutedEventArgs e)
+        {
+            //stub for build cache button
+            //This needs to use a function on the MainScreen_VC to pass the List of UIA_ELementInfo to the gridfilewriter
+            mainScreenVc.BuildCacheFile();
+        }
         #endregion
 
     }

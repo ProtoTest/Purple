@@ -73,6 +73,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DataHandlers\GridFileWriter.cs" />
     <Compile Include="DataHandlers\StartOptions.cs" />
     <Compile Include="ViewControllers\MainScreen_VC.cs" />
     <Page Include="MainWindow.xaml">

@@ -345,6 +345,13 @@ namespace Purple.ViewControllers
             }
         }
         #endregion
+
+        public void BuildCacheFile()
+        {
+            GridFileWriter gfw = new GridFileWriter();
+            gfw.ListofElements = _CachefileBuilder.ElementsInCache;
+            gfw.SaveFile();
+        }
         
         public void TestPurplePath(string purplePath)
         {
