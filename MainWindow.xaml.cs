@@ -181,7 +181,8 @@ namespace Purple
         {
             //stub for build cache button
             //This needs to use a function on the MainScreen_VC to pass the List of UIA_ELementInfo to the gridfilewriter
-            mainScreenVc.BuildCacheFile();
+            bool locatorsOnly = (bool) ckbx_Locators_Only.IsChecked;
+            mainScreenVc.BuildCacheFile(locatorsOnly);
         }
         #endregion
 

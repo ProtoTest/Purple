@@ -30,40 +30,54 @@ namespace Purple.DataHandlers
             "//Elements found using Purple UI - verify Golem.Purple settings match PurpleUI app.config before using\n\n";
 
 
-        private void BuildFile(string filename)
+        private void BuildFile(string filename, bool locatorsOnly = false)
         {
             streamWriter = new StreamWriter(filename, false);
-            streamWriter.WriteLine(COMMENTLINE);
-            streamWriter.WriteLine(" ");
-            
+            if (!locatorsOnly)
+            {
+                streamWriter.WriteLine(COMMENTLINE);
+                streamWriter.WriteLine(" ");
+            }
+            string outputString = "";
+
             for (int i = 0; i < _cachedElements.Count; i++)
             {
-                string ElementType = _cachedElements[i].elementData()[4];
-                string outputString = PURUNKNOWN + " " + VARLABEL + i + CREATENEW + PURUNKNOWN + "(\"" +
-                                      _cachedElements[i].elementData()[2] + "\", \"" +
-                                      _cachedElements[i].elementData()[5] + "\");";
+                if (!locatorsOnly)
+                {
+                    string ElementType = _cachedElements[i].elementData()[4];
+                    outputString = PURUNKNOWN + " " + VARLABEL + i + CREATENEW + PURUNKNOWN + "(\"" +
+                                          _cachedElements[i].elementData()[2] + "\", \"" +
+                                          _cachedElements[i].elementData()[5] + "\");";
 
-                if (ElementType == "button")
-                {
-                    outputString = outputString.Replace(PURUNKNOWN, PURBUTTON);
+                    if (ElementType == "button")
+                    {
+                        outputString = outputString.Replace(PURUNKNOWN, PURBUTTON);
+                    }
+                    if (ElementType == "textbox")
+                    {
+                        outputString = outputString.Replace(PURUNKNOWN, PURTEXTBOX);
+                    }
+                    if (ElementType == "window")
+                    {
+                        outputString = outputString.Replace(PURUNKNOWN, PURWINDOW);
+                    }
                 }
-                if (ElementType == "textbox")
+                else
                 {
-                    outputString = outputString.Replace(PURUNKNOWN, PURTEXTBOX);
+                    outputString = "\"" + _cachedElements[i].elementData()[5] + "\"";
                 }
-                if (ElementType == "window")
-                {
-                    outputString = outputString.Replace(PURUNKNOWN, PURWINDOW);
-                }
+
                 streamWriter.WriteLine(outputString);
-                
+
             }
-           
+            
+            
+
             streamWriter.Close();
 
         }
 
-        public void SaveFile()
+        public void SaveFile(bool locatorOnly)
         {
             SaveFileDialog svd = new SaveFileDialog();
             svd.Filter = "Text Files (*.txt)|*.txt";
@@ -72,7 +86,7 @@ namespace Purple.DataHandlers
 
             if(svd.ShowDialog() == DialogResult.OK)
             {
-                BuildFile(svd.FileName);
+                BuildFile(svd.FileName, locatorOnly);
             }
 
 
